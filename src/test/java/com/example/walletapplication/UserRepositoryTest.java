@@ -12,10 +12,10 @@ public class UserRepositoryTest {
     @Test
     public void testFindByUsername() {
         UserRepository userRepository = mock(UserRepository.class);
-        User expectedUser = new User("testUser", "testPassword");
-        when(userRepository.findByUsername("testUser")).thenReturn(expectedUser);
+        User expectedUser = new User("sai", "password456");
+        when(userRepository.findByUsername("sai")).thenReturn(expectedUser);
 
-        User actualUser = userRepository.findByUsername("testUser");
+        User actualUser = userRepository.findByUsername("sai");
 
         assertNotNull(actualUser);
         assertEquals(expectedUser.getUsername(), actualUser.getUsername());

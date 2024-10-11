@@ -2,6 +2,8 @@ package com.example.walletapplication;
 
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
+import com.example.walletapplication.exception.InsufficientBalanceException;
+import com.example.walletapplication.exception.InvalidAmountException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -70,7 +72,7 @@ public class WalletTest {
     @Test
     public void testWithdrawNegativeAmount() {
         Wallet wallet = new Wallet();
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidAmountException.class, () -> {
             wallet.withdraw(-50.0);
         });
     }
@@ -78,7 +80,7 @@ public class WalletTest {
     @Test
     public void testWithdrawZeroAmount() {
         Wallet wallet = new Wallet();
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidAmountException.class, () -> {
             wallet.withdraw(0.0);
         });
     }
@@ -87,7 +89,7 @@ public class WalletTest {
     public void testWithdrawInsufficientBalance() {
         Wallet wallet = new Wallet();
         wallet.deposit(50.0);
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InsufficientBalanceException.class, () -> {
             wallet.withdraw(100.0);
         });
     }
@@ -103,7 +105,7 @@ public class WalletTest {
     @Test
     public void testDepositInvalidAmount() {
         Wallet wallet = new Wallet();
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(InvalidAmountException.class, () -> {
             wallet.deposit(-50.0);
         });
     }

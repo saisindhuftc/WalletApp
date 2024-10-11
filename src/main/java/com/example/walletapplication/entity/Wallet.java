@@ -1,5 +1,7 @@
 package com.example.walletapplication.entity;
 
+import com.example.walletapplication.exception.InsufficientBalanceException;
+import com.example.walletapplication.exception.InvalidAmountException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,17 +27,17 @@ public class Wallet {
 
     public void deposit(Double amount) {
         if (amount == null || amount <= 0) {
-            throw new IllegalArgumentException("Deposit amount must be greater than 0");
+            throw new InvalidAmountException("Amount must be greater than 0");
         }
         this.balance += amount;
     }
 
     public void withdraw(Double amount) {
         if (amount == null || amount <= 0) {
-            throw new IllegalArgumentException("Withdraw amount must be greater than 0");
+            throw new InvalidAmountException("Amount must be greater than 0");
         }
         if (this.balance < amount) {
-            throw new IllegalArgumentException("Insufficient balance");
+            throw new InsufficientBalanceException("Insufficient balance");
         }
         this.balance -= amount;
     }

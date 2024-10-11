@@ -1,5 +1,6 @@
 package com.example.walletapplication.entity;
 
+import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,11 +30,11 @@ public class User {
 
     public User(String username, String password) {
         if (!isValidUser(username, password)) {
-            throw new IllegalArgumentException("Invalid user username and password must not be null or empty");
+            throw new InvalidUsernameAndPasswordException("Invalid user username and password must not be null or empty");
         }
         this.username = username;
         this.password = password;
-        wallet = new Wallet();
+        this.wallet = new Wallet();
     }
 
     private boolean isValidUser(String username, String password) {

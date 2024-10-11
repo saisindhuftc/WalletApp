@@ -1,7 +1,7 @@
-package com.example.walletapplication.repository;
-
+package com.example.walletapplication;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
+import com.example.walletapplication.repository.WalletRepository;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -11,9 +11,9 @@ public class WalletRepositoryTest {
     @Test
     public void testFindByUser() {
         WalletRepository walletRepository = mock(WalletRepository.class);
-        User expectedUser = new User("testUser", "testPassword");
+        User expectedUser = new User("sai", "password123");
         Wallet expectedWallet = new Wallet();
-        expectedWallet.setUser(expectedUser); // Establish the relationship
+        expectedWallet.setUser(expectedUser);
 
         when(walletRepository.findByUser(expectedUser)).thenReturn(expectedWallet);
 
