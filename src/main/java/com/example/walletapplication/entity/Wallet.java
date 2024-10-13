@@ -3,11 +3,7 @@ package com.example.walletapplication.entity;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
-@Setter
-@Getter
 @Entity
 public class Wallet {
 
@@ -25,14 +21,19 @@ public class Wallet {
         this.balance = 0.0;
     }
 
-    public void deposit(Double amount) {
+    public Wallet(User user) {
+        this.user = user;
+    }
+
+    public double deposit(Double amount) {
         if (amount == null || amount <= 0) {
             throw new InvalidAmountException("Amount must be greater than 0");
         }
         this.balance += amount;
+        return this.balance;
     }
 
-    public void withdraw(Double amount) {
+    public double withdraw(Double amount) {
         if (amount == null || amount <= 0) {
             throw new InvalidAmountException("Amount must be greater than 0");
         }
@@ -40,5 +41,6 @@ public class Wallet {
             throw new InsufficientBalanceException("Insufficient balance");
         }
         this.balance -= amount;
+        return this.balance;
     }
 }

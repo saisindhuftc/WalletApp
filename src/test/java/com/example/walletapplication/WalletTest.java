@@ -5,9 +5,10 @@ import com.example.walletapplication.entity.Wallet;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WalletTest {
+class WalletTest {
 
     @Test
     public void testWalletCreation() {
@@ -15,98 +16,75 @@ public class WalletTest {
         assertNotNull(wallet);
     }
 
+    //Tests for Deposi()
+
     @Test
-    public void testWalletBalanceAfterCreation() {
-        Wallet wallet = new Wallet();
-        assertEquals(0.0, wallet.getBalance());
+    public void testDepositValidAmount() {
+        Wallet wallet = new Wallet(new User("sai", "password456"));
+        double newBalance = wallet.deposit(150.0);
+        assertEquals(150.0, newBalance);
     }
 
     @Test
-    public void testValidWalletId() {
-        Wallet wallet = new Wallet();
-        assertNull(wallet.getId());
+    public void testDepositInvalidAmount() {
+        Wallet wallet = new Wallet(new User("pooji", "password200"));
+        Exception exception = assertThrows(InvalidAmountException.class, () -> {
+            wallet.deposit(-50.0);
+        });
+        assertEquals("Amount must be greater than 0", exception.getMessage());
     }
 
-    @Test
-    public void testInValidWalletId() {
-        Wallet wallet = new Wallet();
-        assertNull(wallet.getId());
-    }
-
-    @Test
-    public void testValidBalance() {
-        Wallet wallet = new Wallet();
-        wallet.deposit(200.0);
-        assertEquals(200.0, wallet.getBalance());
-    }
-
-    @Test
-    public void testInValidBalance() {
-        Wallet wallet = new Wallet();
-        wallet.deposit(200.0);
-        assertNotEquals(300.0, wallet.getBalance());
-    }
-
-    @Test
-    public void testWalletSetBalance() {
-        Wallet wallet = new Wallet();
-        wallet.deposit(150.0);
-        assertEquals(150.0, wallet.getBalance());
-    }
-
-    @Test
-    public void testTwoWalletCreations() {
-        Wallet wallet1 = new Wallet();
-        Wallet wallet2 = new Wallet();
-        assertNotEquals(wallet1, wallet2);
-    }
-
-    @Test
-    public void testWithdraw() {
-        Wallet wallet = new Wallet();
-        wallet.deposit(100.0);
-        wallet.withdraw(50.0);
-        assertEquals(50.0, wallet.getBalance());
-    }
+    //Tests for Withdraw()
 
     @Test
     public void testWithdrawNegativeAmount() {
-        Wallet wallet = new Wallet();
-        assertThrows(InvalidAmountException.class, () -> {
-            wallet.withdraw(-50.0);
+        Wallet wallet = new Wallet(new User("lahari", "password100"));
+        Exception exception = assertThrows(InvalidAmountException.class, () -> {
+            wallet.withdraw(-10.0);
         });
+        assertEquals("Amount must be greater than 0", exception.getMessage());
     }
 
     @Test
     public void testWithdrawZeroAmount() {
-        Wallet wallet = new Wallet();
-        assertThrows(InvalidAmountException.class, () -> {
+        Wallet wallet = new Wallet(new User("sindhu", "password123"));
+        Exception exception = assertThrows(InvalidAmountException.class, () -> {
             wallet.withdraw(0.0);
         });
+        assertEquals("Amount must be greater than 0", exception.getMessage());
+    }
+
+    @Test
+    public void testWithdrawValidAmount() {
+        Wallet wallet = new Wallet(new User("pooji", "password200"));
+        wallet.deposit(200.0);
+        double newBalance = wallet.withdraw(100.0);
+        assertEquals(100.0, newBalance);
     }
 
     @Test
     public void testWithdrawInsufficientBalance() {
-        Wallet wallet = new Wallet();
-        wallet.deposit(50.0);
-        assertThrows(InsufficientBalanceException.class, () -> {
+        Wallet wallet = new Wallet(new User("nas", "password789"));
+        Exception exception = assertThrows(InsufficientBalanceException.class, () -> {
             wallet.withdraw(100.0);
         });
+        assertEquals("Insufficient balance", exception.getMessage());
     }
 
     @Test
-    public void testDeposit() {
-        Wallet wallet = new Wallet();
-        wallet.deposit(100.0);
-        assertEquals(100.0, wallet.getBalance());
-    }
-
-
-    @Test
-    public void testDepositInvalidAmount() {
-        Wallet wallet = new Wallet();
-        assertThrows(InvalidAmountException.class, () -> {
-            wallet.deposit(-50.0);
+    public void testWithdrawInvalidAmount() {
+        Wallet wallet = new Wallet(new User("lahari", "password100"));
+        Exception exception = assertThrows(InvalidAmountException.class, () -> {
+            wallet.withdraw(-10.0);
         });
+        assertEquals("Amount must be greater than 0", exception.getMessage());
+    }
+
+    @Test
+    public void testTwoWalletCreations(){
+        Wallet wallet1 = new Wallet(new User("sai", "password456"));
+        Wallet wallet2 = new Wallet(new User("pooji", "password200"));
+        assertNotNull(wallet1);
+        assertNotNull(wallet2);
     }
 }
