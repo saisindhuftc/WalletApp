@@ -1,10 +1,8 @@
 package com.example.walletapplication.controller;
 
 import com.example.walletapplication.entity.User;
+import com.example.walletapplication.exception.InvalidCredentialsException;
 import com.example.walletapplication.exception.UserAlreadyExistsException;
-import com.example.walletapplication.exception.UserNotFoundException;
-import com.example.walletapplication.exception.InsufficientBalanceException;
-import com.example.walletapplication.exception.InvalidAmountException;
 import com.example.walletapplication.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,31 +27,13 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{id}/deposit")
-    public ResponseEntity<?> deposit(@PathVariable Long id, @RequestParam Double amount) {
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestParam String username, @RequestParam String password) {
         try {
-            Double newBalance = userService.deposit(id, amount);
-            return ResponseEntity.ok("Deposit successful. New balance: " + newBalance);
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage()); // Not Found
-        } catch (InvalidAmountException e) {
-            return ResponseEntity.status(422).body(e.getMessage()); // Unprocessable Entity
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/{id}/withdraw")
-    public ResponseEntity<?> withdraw(@PathVariable Long id, @RequestParam Double amount) {
-        try {
-            Double newBalance = userService.withdraw(id, amount);
-            return ResponseEntity.ok("Withdrawal successful. New balance: " + newBalance);
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage()); // Not Found
-        } catch (InvalidAmountException e) {
-            return ResponseEntity.status(422).body(e.getMessage()); // Unprocessable Entity
-        } catch (InsufficientBalanceException e) {
-            return ResponseEntity.status(400).body(e.getMessage()); // Bad Request
+            User user = userService.loginUser(username, password);
+            return ResponseEntity.ok(user);
+        } catch (InvalidCredentialsException e) {
+            return ResponseEntity.status(401).body(e.getMessage()); // Unauthorized
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

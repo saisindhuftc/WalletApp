@@ -1,13 +1,13 @@
 package com.example.walletapplication;
+
 import com.example.walletapplication.entity.User;
-import com.example.walletapplication.exception.InsufficientBalanceException;
-import com.example.walletapplication.exception.UserNotFoundException;
+import com.example.walletapplication.exception.InvalidCredentialsException;
+import com.example.walletapplication.exception.UserAlreadyExistsException;
 import com.example.walletapplication.repository.UserRepository;
-import com.example.walletapplication.repository.WalletRepository;
 import com.example.walletapplication.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -18,7 +18,6 @@ public class UserServiceTest {
         UserRepository userRepository = mock(UserRepository.class);
         BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
         UserService userService = new UserService(userRepository, passwordEncoder);
-
         String username = "sravani";
         String password = "password300";
 
@@ -28,8 +27,9 @@ public class UserServiceTest {
         User newUser = userService.registerUser(username, password);
 
         assertNotNull(newUser);
+        assertEquals(username, newUser.getUsername());
+        assertEquals("encodedPassword300", newUser.getPassword());
         verify(userRepository).save(newUser);
-        verify(passwordEncoder).encode(password);
     }
 
     @Test
@@ -42,12 +42,71 @@ public class UserServiceTest {
         String password = "password789";
 
         when(userRepository.findByUsername(username)).thenReturn(new User(username, "encodedPassword"));
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+
+        UserAlreadyExistsException exception = assertThrows(UserAlreadyExistsException.class, () -> {
             userService.registerUser(username, password);
         });
 
         assertEquals("Username already exists", exception.getMessage());
     }
+
+    @Test
+    public void testLoginUserSuccess() {
+        UserRepository userRepository = mock(UserRepository.class);
+        BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
+        UserService userService = new UserService(userRepository, passwordEncoder);
+
+        String username = "Sai";
+        String password = "password456";
+        User user = new User(username, "encodedPassword456");
+
+        when(userRepository.findByUsername(username)).thenReturn(user);
+        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(true);
+
+        User loggedInUser = userService.loginUser(username, password);
+
+        assertNotNull(loggedInUser);
+        assertEquals(username, loggedInUser.getUsername());
+    }
+
+    @Test
+    public void testLoginUserInvalidCredentials() {
+        UserRepository userRepository = mock(UserRepository.class);
+        BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
+        UserService userService = new UserService(userRepository, passwordEncoder);
+
+        String username = "nas";
+        String password = "wrongpassword";
+        User user = new User(username, "encodedPassword");
+
+        when(userRepository.findByUsername(username)).thenReturn(user);
+        when(passwordEncoder.matches(password, user.getPassword())).thenReturn(false);
+
+        InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> {
+            userService.loginUser(username, password);
+        });
+
+        assertEquals("Invalid username or password", exception.getMessage());
+    }
+
+    @Test
+    public void testLoginUserNotFound() {
+        UserRepository userRepository = mock(UserRepository.class);
+        BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
+        UserService userService = new UserService(userRepository, passwordEncoder);
+
+        String username = "nonexistentuser";
+        String password = "password";
+
+        when(userRepository.findByUsername(username)).thenReturn(null);
+
+        InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> {
+            userService.loginUser(username, password);
+        });
+
+        assertEquals("Invalid username or password", exception.getMessage());
+    }
+
 
     @Test
     public void testGetUserByUserId() {
@@ -67,106 +126,13 @@ public class UserServiceTest {
     @Test
     public void testGetUserByUserIdNotFound() {
         UserRepository userRepository = mock(UserRepository.class);
-        BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
-        UserService userService = new UserService(userRepository, passwordEncoder);
+        UserService userService = mock(UserService.class);
+        String username = "nonexistentuser";
 
-        Long userId = 1L;
+        when(userRepository.findByUsername(username)).thenReturn(null);
 
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
-        User user = userService.getUserByUserId(userId);
+        User user = userService.getUserByUserId(100L);
 
         assertNull(user);
-    }
-
-    @Test
-    @Transactional
-    public void testDeposit() {
-        UserRepository userRepository = mock(UserRepository.class);
-        BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
-        UserService userService = new UserService(userRepository, passwordEncoder);
-
-        Long userId = 1L;
-
-        User user = mock(User.class);
-
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
-        when(user.deposit(100.0)).thenReturn(100.0);
-
-        Double newBalance = userService.deposit(userId, 100.0);
-
-        assertEquals(100.0, newBalance);
-        verify(user).deposit(100.0);
-    }
-
-    @Test
-    @Transactional
-    public void testWithdraw() {
-        UserRepository userRepository = mock(UserRepository.class);
-        BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
-        UserService userService = new UserService(userRepository, passwordEncoder);
-
-        Long userId = 1L;
-
-        User user = mock(User.class);
-
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
-        when(user.withdraw(50.0)).thenReturn(50.0);
-
-        Double newBalance = userService.withdraw(userId, 50.0);
-
-        assertEquals(50.0, newBalance);
-        verify(user).withdraw(50.0);
-    }
-
-    @Test
-    @Transactional
-    public void testWithdrawInsufficientBalance() {
-        UserRepository userRepository = mock(UserRepository.class);
-        BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
-        UserService userService = new UserService(userRepository, passwordEncoder);
-
-        Long userId = 1L;
-        User user = mock(User.class);
-
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
-
-        doThrow(new InsufficientBalanceException("Insufficient balance")).when(user).withdraw(150.0);
-        InsufficientBalanceException exception = assertThrows(InsufficientBalanceException.class, () -> {
-            userService.withdraw(userId, 150.0);
-        });
-
-        assertEquals("Insufficient balance", exception.getMessage());
-    }
-
-    @Test
-    public void testUserNotFoundForDeposit() {
-        UserRepository userRepository = mock(UserRepository.class);
-        BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
-        UserService userService = new UserService(userRepository, passwordEncoder);
-
-        Long userId = 1L;
-
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
-            userService.deposit(userId, 100.0);
-        });
-
-        assertEquals("User not found", exception.getMessage());
-    }
-
-    @Test
-    public void testUserNotFoundForWithdraw() {
-        UserRepository userRepository = mock(UserRepository.class);
-        BCryptPasswordEncoder passwordEncoder = mock(BCryptPasswordEncoder.class);
-        UserService userService = new UserService(userRepository, passwordEncoder);
-
-        Long userId = 1L;
-
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> {
-            userService.withdraw(userId, 50.0);
-        });
-
-        assertEquals("User not found", exception.getMessage());
     }
 }

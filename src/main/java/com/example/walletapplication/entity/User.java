@@ -2,7 +2,11 @@ package com.example.walletapplication.entity;
 
 import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "username")})
 public class User {
@@ -20,6 +24,7 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Wallet wallet;
 
+
     public User() {
     }
 
@@ -29,15 +34,7 @@ public class User {
         }
         this.username = username;
         this.password = password;
-        this.wallet = new Wallet(this);
-    }
-
-    public Double deposit(Double amount) {
-        return wallet.deposit(amount);
-    }
-
-    public Double withdraw(Double amount) {
-        return wallet.withdraw(amount);
+        this.wallet = new Wallet();
     }
 
     private boolean isValidUser(String username, String password) {
