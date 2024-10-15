@@ -24,27 +24,27 @@ public class WalletController {
             walletService.deposit(id, amount);
             return ResponseEntity.ok("Deposit successful");
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage()); // Not Found
+            return ResponseEntity.status(404).body(e.getMessage());
         } catch (InvalidAmountException e) {
-            return ResponseEntity.status(422).body(e.getMessage()); // Unprocessable Entity
+            return ResponseEntity.status(422).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage()); // Internal Server Error
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
-    @PostMapping("{id}/withdraw")
+    @PostMapping("{id}/withdrawal")
     public ResponseEntity<String> withdraw(@PathVariable Long id, @RequestParam Double amount) {
         try {
             walletService.withdraw(id, amount);
             return ResponseEntity.ok("Withdrawal successful");
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage()); // Not Found
+            return ResponseEntity.status(404).body(e.getMessage());
         } catch (InvalidAmountException e) {
-            return ResponseEntity.status(422).body(e.getMessage()); // Unprocessable Entity
+            return ResponseEntity.status(422).body(e.getMessage());
         } catch (InsufficientBalanceException e) {
-            return ResponseEntity.status(400).body(e.getMessage()); // Bad Request
+            return ResponseEntity.status(400).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage()); // Internal Server Error
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
@@ -54,13 +54,13 @@ public class WalletController {
             walletService.transfer(fromUserId, toUserId, amount);
             return ResponseEntity.ok("Transfer successful");
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage()); // Not Found
+            return ResponseEntity.status(404).body(e.getMessage());
         } catch (InvalidAmountException e) {
-            return ResponseEntity.status(422).body(e.getMessage()); // Unprocessable Entity
+            return ResponseEntity.status(422).body(e.getMessage());
         } catch (InsufficientBalanceException e) {
-            return ResponseEntity.status(400).body(e.getMessage()); // Bad Request
+            return ResponseEntity.status(400).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage()); // Internal Server Error
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
@@ -70,9 +70,9 @@ public class WalletController {
             List<Transaction> transactions = walletService.getTransactionHistory(id);
             return ResponseEntity.ok(transactions);
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(404).body(null); // Not Found
+            return ResponseEntity.status(404).body(null);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null); // Internal Server Error
+            return ResponseEntity.status(500).body(null);
         }
     }
 }

@@ -1,14 +1,10 @@
 package com.example.walletapplication.entity;
 
-import com.example.walletapplication.enums.TransactionType;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Setter
 @Getter
@@ -28,11 +24,6 @@ public class Wallet {
     public Wallet() {
         this.balance = 0.0;
     }
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "wallet_id")
-    private List<Transaction> transactions = new ArrayList<>();
-
 
     public void deposit(Double amount) {
         if (amount == null || amount <= 0) {
