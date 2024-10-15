@@ -1,10 +1,14 @@
 package com.example.walletapplication.entity;
 
+import com.example.walletapplication.enums.TransactionType;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -25,6 +29,11 @@ public class Wallet {
         this.balance = 0.0;
     }
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "wallet_id")
+    private List<Transaction> transactions = new ArrayList<>();
+
+
     public void deposit(Double amount) {
         if (amount == null || amount <= 0) {
             throw new InvalidAmountException("Amount must be greater than 0");
@@ -40,5 +49,16 @@ public class Wallet {
             throw new InsufficientBalanceException("Insufficient balance");
         }
         this.balance -= amount;
+    }
+
+    public void transfer(double amount, Wallet recipient) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Transfer amount must be positive");
+        }
+        if (amount > this.balance) {
+            throw new InsufficientBalanceException("Insufficient balance");
+        }
+        this.balance -= amount;
+        recipient.balance += amount;
     }
 }

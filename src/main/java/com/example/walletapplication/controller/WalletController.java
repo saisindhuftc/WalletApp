@@ -19,7 +19,7 @@ public class WalletController {
     private WalletService walletService;
 
     @PostMapping("/{id}/deposit")
-    public ResponseEntity<String> deposit(@PathVariable Long id, @RequestParam Double amount) {
+    public ResponseEntity<?> deposit(@PathVariable Long id, @RequestParam Double amount) {
         try {
             walletService.deposit(id, amount);
             return ResponseEntity.ok("Deposit successful");

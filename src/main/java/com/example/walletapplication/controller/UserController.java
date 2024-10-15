@@ -1,5 +1,7 @@
 package com.example.walletapplication.controller;
 
+import com.example.walletapplication.dto.UserRequestDTO;
+import com.example.walletapplication.dto.UserResponseDTO;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.exception.InvalidCredentialsException;
 import com.example.walletapplication.exception.UserAlreadyExistsException;
@@ -16,10 +18,11 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> registerUser(@RequestBody UserRequestDTO userRequestDTO) {
         try {
-            User user = userService.registerUser(username, password);
-            return ResponseEntity.ok(user);
+            User user = userService.registerUser(userRequestDTO.getUsername(), userRequestDTO.getPassword());
+            UserResponseDTO userResponseDTO = new UserResponseDTO(user.getId(), user.getUsername());
+            return ResponseEntity.ok(userResponseDTO);
         } catch (UserAlreadyExistsException e) {
             return ResponseEntity.status(409).body(e.getMessage()); // Conflict
         } catch (Exception e) {
@@ -28,10 +31,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> loginUser(@RequestBody UserRequestDTO userRequestDTO) {
         try {
-            User user = userService.loginUser(username, password);
-            return ResponseEntity.ok(user);
+            User user = userService.loginUser(userRequestDTO.getUsername(), userRequestDTO.getPassword());
+            UserResponseDTO userResponseDTO = new UserResponseDTO(user.getId(), user.getUsername());
+            return ResponseEntity.ok(userResponseDTO);
         } catch (InvalidCredentialsException e) {
             return ResponseEntity.status(401).body(e.getMessage()); // Unauthorized
         } catch (Exception e) {
@@ -40,11 +44,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserByUserId(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDTO> getUserByUserId(@PathVariable Long id) {
         User user = userService.getUserByUserId(id);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(user);
+        UserResponseDTO userResponseDTO = new UserResponseDTO(user.getId(), user.getUsername());
+        return ResponseEntity.ok(userResponseDTO);
     }
 }

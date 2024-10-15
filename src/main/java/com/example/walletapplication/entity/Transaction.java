@@ -30,11 +30,12 @@ public class Transaction {
 
     public Transaction() {}
 
-    public Transaction(Long walletId, Double amount, TransactionType transactionType) {
+    public Transaction(Double amount, TransactionType transactionType,Long walletId) {
         this.walletId = walletId;
         this.amount = amount;
         this.transactionType = transactionType;
         this.timestamp = LocalDateTime.now();
     }
+
 }
 

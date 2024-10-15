@@ -1,5 +1,6 @@
 package com.example.walletapplication.entity;
 
+import com.example.walletapplication.enums.Location;
 import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,7 +24,6 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Wallet wallet;
-
 
     public User() {
     }
