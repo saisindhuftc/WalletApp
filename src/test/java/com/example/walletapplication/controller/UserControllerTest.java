@@ -1,6 +1,5 @@
-package com.example.walletapplication;
+package com.example.walletapplication.controller;
 
-import com.example.walletapplication.controller.UserController;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.exception.InvalidCredentialsException;
 import com.example.walletapplication.exception.UserAlreadyExistsException;

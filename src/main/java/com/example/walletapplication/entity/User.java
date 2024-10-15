@@ -1,43 +1,38 @@
 package com.example.walletapplication.entity;
 
-import com.example.walletapplication.enums.Location;
-import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
+import com.example.walletapplication.entity.Wallet;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
-@Getter
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "username")})
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer userId;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(unique = true)
+    private String userName;
 
-    @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    private Wallet wallet;
 
-    public User() {
-    }
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "USERID")
+    private List<Wallet> wallets = new ArrayList<>();
 
-    public User(String username, String password) {
-        if (!isValidUser(username, password)) {
-            throw new InvalidUsernameAndPasswordException("Invalid user username and password must not be null or empty");
-        }
-        this.username = username;
+    public User(String userName, String password) {
+        this.userName = userName;
         this.password = password;
-        this.wallet = new Wallet();
-    }
-
-    private boolean isValidUser(String username, String password) {
-        return username != null && !username.isEmpty() && password != null && !password.isEmpty();
+        this.wallets.add(new Wallet());
     }
 }

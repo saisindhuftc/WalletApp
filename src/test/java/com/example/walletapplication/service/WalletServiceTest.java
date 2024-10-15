@@ -1,15 +1,13 @@
-package com.example.walletapplication;
+package com.example.walletapplication.service;
 
 import com.example.walletapplication.entity.Transaction;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
-import com.example.walletapplication.enums.TransactionType;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.UserNotFoundException;
 import com.example.walletapplication.repository.TransactionRepository;
 import com.example.walletapplication.repository.UserRepository;
 import com.example.walletapplication.repository.WalletRepository;
-import com.example.walletapplication.service.WalletService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

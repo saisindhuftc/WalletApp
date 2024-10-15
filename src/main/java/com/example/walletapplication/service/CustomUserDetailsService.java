@@ -1,10 +1,9 @@
 package com.example.walletapplication.service;
 
 
-import com.example.walletapplication.Security.CustomUserDetails;
+import com.example.walletapplication.entity.CustomUserDetails;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,8 +1,7 @@
-package com.example.walletapplication;
+package com.example.walletapplication.repository;
 
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
-import com.example.walletapplication.repository.WalletRepository;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

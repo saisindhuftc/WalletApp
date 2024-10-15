@@ -1,7 +1,5 @@
-package com.example.walletapplication;
+package com.example.walletapplication.entity;
 
-import com.example.walletapplication.entity.User;
-import com.example.walletapplication.entity.Wallet;
 import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,15 +15,15 @@ public class UserTest {
     @Test
     public void testUserAfterCreation() {
         User user = new User("sai", "password456");
-        assertEquals("sai", user.getUsername());
+        assertEquals("sai", user.getUserName());
         assertEquals("password456", user.getPassword());
-        assertNotNull(user.getWallet());
+        assertNotNull(user.getWallets());
     }
 
     @Test
     public void testValidId() {
         User user = new User("sindhu", "password123");
-        assertNull(user.getId());
+        assertNull(user.getUserId());
     }
 
     @Test
@@ -38,7 +36,7 @@ public class UserTest {
     @Test
     public void testValidUsername() {
         User user = new User("lahari", "password100");
-        assertEquals("lahari", user.getUsername());
+        assertEquals("lahari", user.getUserName());
     }
 
     @Test
@@ -57,7 +55,7 @@ public class UserTest {
     @Test
     public void testUserWallet() {
         User user = new User("pooji", "password200");
-        assertNotNull(user.getWallet());
+        assertNotNull(user.getWallets());
     }
 
     @Test
@@ -71,7 +69,7 @@ public class UserTest {
     public void testUserUpdateUsernameAndPassword() {
         User user = new User("nas", "Password789");
         user = new User("nasira", "password254");
-        assertEquals("nasira", user.getUsername());
+        assertEquals("nasira", user.getUserName());
         assertEquals("password254", user.getPassword());
     }
 }

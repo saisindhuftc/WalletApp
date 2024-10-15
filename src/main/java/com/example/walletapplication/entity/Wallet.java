@@ -2,6 +2,7 @@ package com.example.walletapplication.entity;
 
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
+import com.example.walletapplication.requestModels.InterTransactionRequestModel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ public class Wallet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long walletId;
 
     private Double balance;
 
@@ -52,4 +53,10 @@ public class Wallet {
         this.balance -= amount;
         recipient.balance += amount;
     }
+
+    public InterTransaction transact(InterTransactionRequestModel requestModel, User sender, Wallet receiverWallet, User receiver) throws InsufficientBalanceException, InvalidAmountException {
+
+         return InterTransaction;
+    }
+
 }

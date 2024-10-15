@@ -1,6 +1,5 @@
-package com.example.walletapplication.Security;
+package com.example.walletapplication.entity;
 
-import com.example.walletapplication.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

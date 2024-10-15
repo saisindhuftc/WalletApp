@@ -1,6 +1,5 @@
-package com.example.walletapplication.dto;
+package com.example.walletapplication.requestModels;
 
-import com.example.walletapplication.enums.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,5 +15,5 @@ public class UserRequestDTO {
     private Long id;
     private String username;
     private String password;
-    private Role role;
+
 }

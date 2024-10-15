@@ -1,7 +1,5 @@
-package com.example.walletapplication;
+package com.example.walletapplication.entity;
 
-import com.example.walletapplication.entity.User;
-import com.example.walletapplication.entity.Wallet;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
 import org.junit.jupiter.api.Test;
@@ -24,13 +22,13 @@ public class WalletTest {
     @Test
     public void testValidWalletId() {
         Wallet wallet = new Wallet();
-        assertNull(wallet.getId());
+        assertNull(wallet.getWalletId());
     }
 
     @Test
     public void testInValidWalletId() {
         Wallet wallet = new Wallet();
-        assertNull(wallet.getId());
+        assertNull(wallet.getWalletId());
     }
 
     @Test

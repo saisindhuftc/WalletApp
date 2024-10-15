@@ -1,10 +1,9 @@
-package com.example.walletapplication;
+package com.example.walletapplication.service;
 
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.exception.InvalidCredentialsException;
 import com.example.walletapplication.exception.UserAlreadyExistsException;
 import com.example.walletapplication.repository.UserRepository;
-import com.example.walletapplication.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 

@@ -1,6 +1,5 @@
 package com.example.walletapplication.controller;
 
-import com.example.walletapplication.entity.Transaction;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
 import com.example.walletapplication.exception.UserNotFoundException;

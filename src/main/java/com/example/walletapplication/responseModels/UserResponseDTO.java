@@ -1,4 +1,4 @@
-package com.example.walletapplication.dto;
+package com.example.walletapplication.responseModels;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

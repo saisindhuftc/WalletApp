@@ -3,7 +3,7 @@ package com.example.walletapplication.service;
 import com.example.walletapplication.entity.Transaction;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
-import com.example.walletapplication.enums.TransactionType;
+import com.example.walletapplication.enums.IntraTransactionType;
 import com.example.walletapplication.exception.UserNotFoundException;
 import com.example.walletapplication.repository.TransactionRepository;
 import com.example.walletapplication.repository.UserRepository;
@@ -33,7 +33,7 @@ public class WalletService {
         wallet.deposit(amount);
         walletRepository.save(wallet);
 
-        Transaction transaction = new Transaction(amount, TransactionType.DEPOSIT,wallet.getId());
+        Transaction transaction = new Transaction(amount, IntraTransactionType.DEPOSIT,wallet.getWalletId());
         transactionRepository.save(transaction);
     }
 
@@ -44,7 +44,7 @@ public class WalletService {
         wallet.withdraw(amount);
         walletRepository.save(wallet);
 
-        Transaction transaction = new Transaction(amount, TransactionType.WITHDRAWAL,wallet.getId());
+        Transaction transaction = new Transaction(amount, IntraTransactionType.WITHDRAWAL,wallet.getWalletId());
         transactionRepository.save(transaction);
     }
 
@@ -65,6 +65,6 @@ public class WalletService {
     public List<Transaction> getTransactionHistory(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Wallet wallet = walletRepository.findByUser(user);
-        return transactionRepository.findByWalletId(wallet.getId());
+        return transactionRepository.findByWalletId(wallet.getWalletId());
     }
 }
