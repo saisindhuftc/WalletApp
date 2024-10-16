@@ -5,7 +5,6 @@ import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
 import com.example.walletapplication.exception.*;
 import com.example.walletapplication.repository.InterTransactionRepository;
-import com.example.walletapplication.repository.IntraTransactionRepository;
 import com.example.walletapplication.repository.UserRepository;
 import com.example.walletapplication.repository.WalletRepository;
 import com.example.walletapplication.requestModels.InterTransactionRequestModel;

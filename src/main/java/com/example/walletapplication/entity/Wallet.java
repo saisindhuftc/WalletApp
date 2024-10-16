@@ -39,23 +39,19 @@ public class Wallet {
     }
 
     public InterTransaction transact(InterTransactionRequestModel requestModel, User sender, Wallet receiverWallet, User receiver) throws InsufficientBalanceException, InvalidAmountException {
-        // Convert money from sender's wallet currency to receiver's wallet currency
         Money convertedMoney = CurrencyConverter.convertMoney(requestModel.getMoney(), this.getMoney().getCurrency(), receiverWallet.getMoney().getCurrency());
 
-        // Withdraw money from sender's wallet
         this.withdraw(requestModel.getMoney());
         IntraTransaction withdrawTransaction = new IntraTransaction(
                 new Money(requestModel.getMoney().getAmount(), requestModel.getMoney().getCurrency()),
                 IntraTransactionType.WITHDRAWAL, this, LocalDateTime.now()
         );
 
-        // Deposit the converted money into the receiver's wallet
         receiverWallet.deposit(convertedMoney);
         IntraTransaction depositTransaction = new IntraTransaction(
                 convertedMoney, IntraTransactionType.DEPOSIT, receiverWallet, LocalDateTime.now()
         );
 
-        // Return the InterTransaction object with sender and receiver details
         return new InterTransaction(
                 sender, this.getWalletId(), receiver, receiverWallet.getWalletId(),
                 depositTransaction, withdrawTransaction

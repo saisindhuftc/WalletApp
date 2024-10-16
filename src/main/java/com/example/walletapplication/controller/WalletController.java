@@ -1,5 +1,7 @@
 package com.example.walletapplication.controller;
 
+import com.example.walletapplication.exception.InsufficientBalanceException;
+import com.example.walletapplication.exception.WalletNotFoundException;
 import com.example.walletapplication.requestModels.WalletRequestModel;
 import com.example.walletapplication.responseModels.WalletResponseModel;
 import com.example.walletapplication.service.WalletService;
@@ -19,25 +21,33 @@ public class WalletController {
     @Autowired
     private WalletService walletService;
 
-    @PostMapping( "/{wallet_id}/intra-wallet-transaction/deposit")
+    @PostMapping(value = "/{wallet_id}/intra-wallet-transaction", headers = "type=deposit")
     public ResponseEntity<WalletResponseModel> deposit(@PathVariable("wallet_id") int walletId, @RequestBody WalletRequestModel requestModel) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
+
         WalletResponseModel returnedWallet = walletService.deposit(walletId, username, requestModel);
+        if (returnedWallet == null) {
+            throw new WalletNotFoundException("Wallet not found with ID: " + walletId);
+        }
 
         return new ResponseEntity<>(returnedWallet, HttpStatus.ACCEPTED);
     }
 
-    @PostMapping( "/{wallet_id}/intra-wallet-transaction/withdrawal")
+    @PostMapping(value = "/{wallet_id}/intra-wallet-transaction", headers = "type=withdraw")
     public ResponseEntity<WalletResponseModel> withdraw(@PathVariable("wallet_id") int walletId, @RequestBody WalletRequestModel requestModel) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        WalletResponseModel returnedWallet = walletService.withdraw(walletId, username, requestModel);
 
-        return new ResponseEntity<>(returnedWallet, HttpStatus.ACCEPTED);
+        try {
+            WalletResponseModel returnedWallet = walletService.withdraw(walletId, username, requestModel);
+            return new ResponseEntity<>(returnedWallet, HttpStatus.ACCEPTED);
+        } catch (InsufficientBalanceException e) {
+            throw new InsufficientBalanceException("Insufficient balance in wallet ID: " + walletId);
+        }
     }
 
-    @GetMapping("/all")
+    @GetMapping("")
     public ResponseEntity<List<WalletResponseModel>> wallets() {
         List<WalletResponseModel> responseWallets = walletService.getAllWallets();
         return new ResponseEntity<>(responseWallets, HttpStatus.OK);

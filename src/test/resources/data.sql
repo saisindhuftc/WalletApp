@@ -11,3 +11,11 @@ INSERT INTO wallet (id, balance, user_id) VALUES (13, 250.0, 2); -- Wallet for j
 INSERT INTO wallet (id, balance, user_id) VALUES (14, 150.0, 3); -- Wallet for alice_smith
 INSERT INTO wallet (id, balance, user_id) VALUES (15, 300.0, 4); -- Wallet for bob_jones
 INSERT INTO wallet (id, balance, user_id) VALUES (16, 500.0, 5); -- Wallet for carol_brown
+
+
+-- src/test/resources/schema.sql
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255)
+);

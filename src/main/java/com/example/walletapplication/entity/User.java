@@ -1,6 +1,5 @@
 package com.example.walletapplication.entity;
 
-import com.example.walletapplication.entity.Wallet;
 import com.example.walletapplication.enums.Country;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
