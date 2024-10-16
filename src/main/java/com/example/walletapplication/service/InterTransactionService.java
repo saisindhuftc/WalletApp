@@ -27,15 +27,12 @@ public class InterTransactionService {
     @Autowired
     private WalletRepository walletRepository;
 
-    @Autowired
-    private IntraTransactionRepository intraWalletRepository;
-
     public InterTransactionResponseModel transact(InterTransactionRequestModel requestModel) throws InsufficientBalanceException, InvalidAmountException, UserNotFoundException, WalletNotFoundException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User sender = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User "+ username + " not found."));
         User receiver = userRepository.findByUsername(requestModel.getReceiverName()).orElseThrow(() -> new UserNotFoundException("User "+ requestModel.getReceiverName() + " not found."));
-        Wallet senderWallet = walletRepository.findById((long) requestModel.getSenderWalletId()).orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
-        Wallet receiverWallet =  walletRepository.findById((long)requestModel.getReceiverWalletId()).orElseThrow(()-> new WalletNotFoundException("Wallet not found"));
+        Wallet senderWallet = walletRepository.findById(requestModel.getSenderWalletId()).orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
+        Wallet receiverWallet =  walletRepository.findById(requestModel.getReceiverWalletId()).orElseThrow(()-> new WalletNotFoundException("Wallet not found"));
 
         if(!sender.getWallets().contains(senderWallet) || !receiver.getWallets().contains(receiverWallet))
             throw new WalletNotFoundException("Wallet not found");

@@ -1,6 +1,7 @@
 package com.example.walletapplication.entity;
 
 import com.example.walletapplication.entity.Wallet;
+import com.example.walletapplication.enums.Country;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,19 +21,21 @@ public class User {
     private Integer userId;
 
     @Column(unique = true)
-    private String userName;
+    private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private Country country;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "USERID")
     private List<Wallet> wallets = new ArrayList<>();
 
-    public User(String userName, String password) {
-        this.userName = userName;
+    public User(String username, String password, Country country) {
+        this.username = username;
         this.password = password;
-        this.wallets.add(new Wallet());
+        this.wallets.add(new Wallet(country));
     }
 }

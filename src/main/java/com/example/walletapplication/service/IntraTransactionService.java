@@ -33,7 +33,7 @@ public class IntraTransactionService{
     public TransactionsResponseModel allTransactions() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("Username not found."));
-        List<Long> userWallets = user.getWallets().stream().map(Wallet::getWalletId).toList();
+        List<Integer> userWallets = user.getWallets().stream().map(Wallet::getWalletId).toList();
 
         List<IntraTransaction> intraWalletTransactions = intraTransactionRepository.findByWallets(userWallets);
         List<InterTransaction> interWalletTransactions = interTransactionRepository.findTransactionsOfUser(user);
@@ -41,7 +41,7 @@ public class IntraTransactionService{
             intraWalletTransactions.remove(interWalletTransaction.getDeposit());
             intraWalletTransactions.remove(interWalletTransaction.getWithdrawal());
         }
-        List<InterTransactionResponseModel> interWalletTransactionResponseModels = interWalletTransactions.stream().map((transaction -> new InterTransactionResponseModel(transaction.getInterWalletTransactionId(), transaction.getSender().getUserName(), transaction.getSenderWalletId(), transaction.getReceiver().getUserName(), transaction.getReceiverWalletId(), transaction.getDeposit(), transaction.getWithdrawal()))).collect(Collectors.toList());
+        List<InterTransactionResponseModel> interWalletTransactionResponseModels = interWalletTransactions.stream().map((transaction -> new InterTransactionResponseModel(transaction.getInterWalletTransactionId(), transaction.getSender().getUsername(), transaction.getSenderWalletId(), transaction.getReceiver().getUsername(), transaction.getReceiverWalletId(), transaction.getDeposit(), transaction.getWithdrawal()))).collect(Collectors.toList());
 
         return new TransactionsResponseModel(interWalletTransactionResponseModels, intraWalletTransactions);
     }
@@ -49,7 +49,7 @@ public class IntraTransactionService{
     public TransactionsResponseModel allTransactionsDateBased(LocalDate startDate, LocalDate endDate) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("Username not found."));
-        List<Long> userWallets = user.getWallets().stream().map(Wallet::getWalletId).toList();
+        List<Integer> userWallets = user.getWallets().stream().map(Wallet::getWalletId).toList();
 
         List<InterTransaction> interWalletTransactions = interTransactionRepository.findTransactionsOfUserDateBased(user,startDate.atTime(0,0,0), endDate.atTime(23,59,59));
         List<IntraTransaction> intraWalletTransactions = intraTransactionRepository.findByWalletsAndDate(userWallets, startDate.atTime(0,0,0), endDate.atTime(23,59,59));
@@ -57,7 +57,7 @@ public class IntraTransactionService{
             intraWalletTransactions.remove(interWalletTransaction.getDeposit());
             intraWalletTransactions.remove(interWalletTransaction.getWithdrawal());
         }
-        List<InterTransactionResponseModel> interTransactionResponseModels = interWalletTransactions.stream().map((transaction -> new InterTransactionResponseModel(transaction.getInterWalletTransactionId(), transaction.getSender().getUserName(), transaction.getSenderWalletId(), transaction.getReceiver().getUserName(), transaction.getReceiverWalletId(), transaction.getDeposit(), transaction.getWithdrawal()))).collect(Collectors.toList());
+        List<InterTransactionResponseModel> interTransactionResponseModels = interWalletTransactions.stream().map((transaction -> new InterTransactionResponseModel(transaction.getInterWalletTransactionId(), transaction.getSender().getUsername(), transaction.getSenderWalletId(), transaction.getReceiver().getUsername(), transaction.getReceiverWalletId(), transaction.getDeposit(), transaction.getWithdrawal()))).collect(Collectors.toList());
 
         return new TransactionsResponseModel(interTransactionResponseModels, intraWalletTransactions);
     }

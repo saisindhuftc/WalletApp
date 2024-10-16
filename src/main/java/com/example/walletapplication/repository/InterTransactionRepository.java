@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface InterTransactionRepository extends JpaRepository<InterTransaction, Long> {
+public interface InterTransactionRepository extends JpaRepository<InterTransaction, Integer> {
 
     public List<InterTransaction> findTransactionsOfUser(User user);
 

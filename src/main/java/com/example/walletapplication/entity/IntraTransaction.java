@@ -19,6 +19,8 @@ public class IntraTransaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int intraWalletTransactionId;
 
+    private Money money;
+
     @Enumerated(EnumType.STRING)
     private IntraTransactionType type;
 
@@ -28,7 +30,8 @@ public class IntraTransaction {
 
     private LocalDateTime timestamp;
 
-    public IntraTransaction(IntraTransactionType type, Wallet wallet, LocalDateTime timestamp) {
+    public IntraTransaction(Money money,IntraTransactionType type, Wallet wallet, LocalDateTime timestamp) {
+        this.money = money;
         this.type = type;
         this.wallet = wallet;
         this.timestamp = timestamp;
