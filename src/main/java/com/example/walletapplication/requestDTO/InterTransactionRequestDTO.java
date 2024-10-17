@@ -1,6 +1,6 @@
 package com.example.walletapplication.requestDTO;
 
-import com.example.walletapplication.enums.Currency;
+import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.enums.TransactionType;
 import lombok.*;
 
@@ -13,6 +13,17 @@ public class InterTransactionRequestDTO {
     private Long receiverWalletId;
     private Double amount;
     private TransactionType transactionType;
-    private Currency currency;
+    private CurrencyType currency;
     private LocalDateTime timestamp;
+
+    public InterTransactionRequestDTO(Long senderWalletId, Long receiverWalletId, Double amount, CurrencyType currency) {
+        this.senderWalletId = senderWalletId;
+        this.receiverWalletId = receiverWalletId;
+        this.amount = amount;
+        this.currency = currency;
+    }
+
+    public InterTransactionRequestDTO(){
+
+    }
 }

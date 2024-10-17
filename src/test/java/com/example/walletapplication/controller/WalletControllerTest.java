@@ -1,86 +1,180 @@
 package com.example.walletapplication.controller;
 
-import com.example.walletapplication.requestDTO.WalletRequestModel;
-import com.example.walletapplication.responseModels.WalletResponseModel;
+import com.example.walletapplication.enums.CurrencyType;
+import com.example.walletapplication.exception.InsufficientBalanceException;
+import com.example.walletapplication.exception.UnAuthorisedUserException;
+import com.example.walletapplication.exception.UnAuthorisedWalletException;
+import com.example.walletapplication.exception.UserNotFoundException;
+import com.example.walletapplication.requestDTO.WalletRequestDTO;
+import com.example.walletapplication.service.UserService;
 import com.example.walletapplication.service.WalletService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(WalletController.class)
 public class WalletControllerTest {
-
-    @MockBean
-    private WalletService walletService;
-
     @InjectMocks
     private WalletController walletController;
 
-    private MockMvc mockMvc;
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private WalletService walletService;
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(walletController).build();
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    @WithMockUser(username = "testuser")
-    public void testDepositSuccess() throws Exception {
-        WalletRequestModel requestModel = new WalletRequestModel();
-        WalletResponseModel responseModel = new WalletResponseModel();
-        when(walletService.deposit(anyInt(), anyString(), any(WalletRequestModel.class))).thenReturn(responseModel);
+    public void testDepositSuccess() {
+        Long userId = 1L;
+        Long walletId = 2L;
+        WalletRequestDTO depositRequestDTO = new WalletRequestDTO(100.0, CurrencyType.USD);
 
-        mockMvc.perform(post("/api/v1/wallets/1/intra-wallet-transaction")
-                        .header("type", "deposit")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"money\": {\"amount\": 100, \"currency\": \"USD\"}}"))
-                .andExpect(status().isAccepted());
+        doNothing().when(walletService).isUserAuthorized(userId, walletId);
+        doNothing().when(walletService).deposit(userId, 100.0, CurrencyType.USD); // No return value expected
 
-        verify(walletService, times(1)).deposit(anyInt(), anyString(), any(WalletRequestModel.class));
+        ResponseEntity<?> response = walletController.deposit(userId, walletId, depositRequestDTO);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(100.0, response.getBody()); // This should be adjusted as per your actual response structure
+        verify(walletService, times(1)).isUserAuthorized(userId, walletId);
+        verify(walletService, times(1)).deposit(userId, 100.0, CurrencyType.USD);
     }
 
     @Test
-    @WithMockUser(username = "testuser")
-    public void testWithdrawSuccess() throws Exception {
-        WalletRequestModel requestModel = new WalletRequestModel();
-        WalletResponseModel responseModel = new WalletResponseModel();
-        when(walletService.withdraw(anyInt(), anyString(), any(WalletRequestModel.class))).thenReturn(responseModel);
+    public void testWithdrawSuccess() {
+        Long userId = 1L;
+        Long walletId = 2L;
+        WalletRequestDTO withdrawRequestDTO = new WalletRequestDTO(50.0, CurrencyType.USD);
 
-        mockMvc.perform(post("/api/v1/wallets/1/intra-wallet-transaction")
-                        .header("type", "withdraw")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"money\": {\"amount\": 50, \"currency\": \"USD\"}}"))
-                .andExpect(status().isAccepted());
+        doNothing().when(walletService).isUserAuthorized(userId, walletId);
+        when(walletService.withdraw(userId, 50.0, CurrencyType.USD)).thenReturn(50.0);
 
-        verify(walletService, times(1)).withdraw(anyInt(), anyString(), any(WalletRequestModel.class));
+        ResponseEntity<?> response = walletController.withdraw(userId, walletId, withdrawRequestDTO);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(50.0, response.getBody());
+        verify(walletService, times(1)).isUserAuthorized(userId, walletId);
+        verify(walletService, times(1)).withdraw(userId, 50.0, CurrencyType.USD);
     }
 
     @Test
-    @WithMockUser(username = "testuser")
-    public void testGetAllWallets() throws Exception {
-        List<WalletResponseModel> responseModels = new ArrayList<>();
-        when(walletService.getAllWallets()).thenReturn(responseModels);
+    public void testDepositUserNotFound() {
+        Long userId = 1L;
+        Long walletId = 2L;
+        WalletRequestDTO depositRequestDTO = new WalletRequestDTO(100.0, CurrencyType.USD);
 
-        mockMvc.perform(get("/api/v1/wallets")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        doThrow(new UserNotFoundException("User not found")).when(walletService).isUserAuthorized(userId, walletId);
 
-        verify(walletService, times(1)).getAllWallets();
+        ResponseEntity<?> response = walletController.deposit(userId, walletId, depositRequestDTO);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("User not found", response.getBody());
+        verify(walletService, times(1)).isUserAuthorized(userId, walletId);
     }
+
+    @Test
+    public void testDepositUnauthorizedUser() {
+        Long userId = 1L;
+        Long walletId = 2L;
+        WalletRequestDTO depositRequestDTO = new WalletRequestDTO(100.0, CurrencyType.USD);
+
+        doThrow(new UnAuthorisedUserException("User not authorized")).when(walletService).isUserAuthorized(userId, walletId);
+
+        ResponseEntity<?> response = walletController.deposit(userId, walletId, depositRequestDTO);
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals("User not authorized", response.getBody());
+        verify(walletService, times(1)).isUserAuthorized(userId, walletId);
+    }
+
+    @Test
+    public void testWithdrawUserNotFound() {
+        Long userId = 1L;
+        Long walletId = 2L;
+        WalletRequestDTO withdrawRequestDTO = new WalletRequestDTO(50.0, CurrencyType.USD);
+
+        doThrow(new UserNotFoundException("User not found")).when(walletService).isUserAuthorized(userId, walletId);
+
+        ResponseEntity<?> response = walletController.withdraw(userId, walletId, withdrawRequestDTO);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("User not found", response.getBody());
+        verify(walletService, times(1)).isUserAuthorized(userId, walletId);
+    }
+
+    @Test
+    public void testWithdrawUnauthorizedUser() {
+        Long userId = 1L;
+        Long walletId = 2L;
+        WalletRequestDTO withdrawRequestDTO = new WalletRequestDTO(50.0, CurrencyType.USD);
+
+        doThrow(new UnAuthorisedUserException("User not authorized")).when(walletService).isUserAuthorized(userId, walletId);
+
+        ResponseEntity<?> response = walletController.withdraw(userId, walletId, withdrawRequestDTO);
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals("User not authorized", response.getBody());
+        verify(walletService, times(1)).isUserAuthorized(userId, walletId);
+    }
+
+    @Test
+    public void testWithdrawUnauthorizedWallet() {
+        Long userId = 1L;
+        Long walletId = 2L;
+        WalletRequestDTO withdrawRequestDTO = new WalletRequestDTO(50.0, CurrencyType.USD);
+
+        doThrow(new UnAuthorisedWalletException("User not authorized for this Wallet")).when(walletService).isUserAuthorized(userId, walletId);
+
+        ResponseEntity<?> response = walletController.withdraw(userId, walletId, withdrawRequestDTO);
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals("User not authorized for this Wallet", response.getBody());
+        verify(walletService, times(1)).isUserAuthorized(userId, walletId);
+    }
+
+    @Test
+    public void testWithdrawInsufficientBalance() {
+        Long userId = 1L;
+        Long walletId = 2L;
+        WalletRequestDTO withdrawRequestDTO = new WalletRequestDTO(50.0, CurrencyType.USD);
+
+        doNothing().when(walletService).isUserAuthorized(userId, walletId);
+        doThrow(new InsufficientBalanceException("Insufficient balance")).when(walletService).withdraw(userId, 50.0, CurrencyType.USD);
+
+        ResponseEntity<?> response = walletController.withdraw(userId, walletId, withdrawRequestDTO);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("An error occurred: Insufficient balance", response.getBody());
+        verify(walletService, times(1)).isUserAuthorized(userId, walletId);
+        verify(walletService, times(1)).withdraw(userId, 50.0, CurrencyType.USD);
+    }
+
+    @Test
+    public void testDepositGeneralException() {
+        Long userId = 1L;
+        Long walletId = 2L;
+        WalletRequestDTO depositRequestDTO = new WalletRequestDTO(100.0, CurrencyType.USD);
+
+        doNothing().when(walletService).isUserAuthorized(userId, walletId);
+        doThrow(new RuntimeException("An unexpected error")).when(walletService).deposit(userId, 100.0, CurrencyType.USD);
+
+        ResponseEntity<?> response = walletController.deposit(userId, walletId, depositRequestDTO);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("An error occurred: An unexpected error", response.getBody());
+        verify(walletService, times(1)).isUserAuthorized(userId, walletId);
+        verify(walletService, times(1)).deposit(userId, 100.0, CurrencyType.USD);
+    }
+
 }

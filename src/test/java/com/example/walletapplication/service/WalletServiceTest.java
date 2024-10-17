@@ -1,78 +1,103 @@
 package com.example.walletapplication.service;
 
-import com.example.walletapplication.entity.Money;
+import com.example.walletapplication.entity.IntraTransaction;
+import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
-import com.example.walletapplication.enums.Currency;
-import com.example.walletapplication.exception.AuthenticationFailedException;
+import com.example.walletapplication.enums.CurrencyType;
+import com.example.walletapplication.exception.*;
+import com.example.walletapplication.repository.IntraTransactionRepository;
 import com.example.walletapplication.repository.UserRepository;
-import com.example.walletapplication.repository.WalletRepository;
-import com.example.walletapplication.requestDTO.WalletRequestModel;
-import com.example.walletapplication.responseModels.WalletResponseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.context.SecurityContext;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-public class WalletServiceTest {
-
-    @Mock
-    private WalletRepository walletRepository;
+@ExtendWith(MockitoExtension.class)
+class WalletServiceTest {
 
     @Mock
     private UserRepository userRepository;
 
-    @MockBean
+    @Mock
+    private IntraTransactionRepository intraTransactionRepository;
+
+    @InjectMocks
     private WalletService walletService;
 
-
-    @Mock
-    private SecurityContext securityContext;
+    private User user;
+    private Wallet wallet;
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        SecurityContextHolder.setContext(securityContext);
+    void setUp() {
+        wallet = new Wallet(CurrencyType.USD);
+        user = new User("testuser", "password", CurrencyType.USD);
+        user.setWallet(wallet);
     }
 
     @Test
-    public void testGetAllWallets() {
-        List<Wallet> wallets = new ArrayList<>();
-        wallets.add(new Wallet());
-        when(walletRepository.findAll()).thenReturn(wallets);
+    void testIsUserAuthorized_UserNotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        List<WalletResponseModel> response = walletService.getAllWallets();
-        assertEquals(1, response.size());
-        verify(walletRepository, times(1)).findAll();
+        assertThrows(UserNotFoundException.class, () -> walletService.isUserAuthorized(1L, wallet.getId()));
     }
 
     @Test
-    public void testDepositUserNotFound() {
-        WalletRequestModel requestModel = new WalletRequestModel(new Money(100.0, Currency.EUR));
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+    void testIsUserAuthorized_UnauthorizedUser() {
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("otheruser");
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        assertThrows(AuthenticationFailedException.class, () -> {
-            walletService.deposit(1, "testuser", requestModel);
-        });
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        assertThrows(UnAuthorisedUserException.class, () -> walletService.isUserAuthorized(1L, wallet.getId()));
     }
 
     @Test
-    public void testWithdrawUserNotFound() {
-        WalletRequestModel requestModel = new WalletRequestModel(new Money(50.0, Currency.USD));
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+    void testDeposit_Success() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
-        assertThrows(AuthenticationFailedException.class, () -> {
-            walletService.withdraw(1, "testuser", requestModel);
-        });
+        assertDoesNotThrow(() -> walletService.deposit(1L, 100.0, CurrencyType.USD));
+        assertEquals(100.0, wallet.getBalance());
+        verify(intraTransactionRepository, times(1)).save(any(IntraTransaction.class));
     }
 
+    @Test
+    void testDeposit_UserNotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> walletService.deposit(1L, 100.0, CurrencyType.USD));
+    }
+
+    @Test
+    void testWithdraw_Success() {
+        wallet.deposit(100.0, CurrencyType.USD);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        assertDoesNotThrow(() -> walletService.withdraw(1L, 50.0, CurrencyType.USD));
+        assertEquals(50.0, wallet.getBalance());
+        verify(intraTransactionRepository, times(1)).save(any(IntraTransaction.class));
+    }
+
+    @Test
+    void testWithdraw_UserNotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> walletService.withdraw(1L, 50.0, CurrencyType.USD));
+    }
+
+    @Test
+    void testWithdraw_InsufficientBalance() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+
+        assertThrows(InsufficientBalanceException.class, () -> walletService.withdraw(1L, 50.0, CurrencyType.USD));
+    }
 }

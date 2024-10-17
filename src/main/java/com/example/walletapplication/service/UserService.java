@@ -28,7 +28,7 @@ public class UserService implements UserDetailsService {
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
             throw new InvalidUsernameAndPasswordException("Username and password cannot be empty");
         }
-        return userRepository.save(new User(username, password));
+        return userRepository.save(new User(username, password,null));
     }
 
     public String delete(Long userId) throws UserNotFoundException {

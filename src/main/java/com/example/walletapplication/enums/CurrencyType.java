@@ -1,6 +1,6 @@
 package com.example.walletapplication.enums;
 
-public enum Currency {
+public enum CurrencyType {
 
     INR(1.0),
     USD(84.08),
@@ -8,7 +8,7 @@ public enum Currency {
 
     private final double conversionFactor;
 
-    Currency(double conversionFactor) {
+    CurrencyType(double conversionFactor) {
         this.conversionFactor = conversionFactor;
     }
 

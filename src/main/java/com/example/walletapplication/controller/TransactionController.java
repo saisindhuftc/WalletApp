@@ -1,7 +1,7 @@
 package com.example.walletapplication.controller;
 
 
-import com.example.walletapplication.enums.Currency;
+import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.enums.TransactionType;
 import com.example.walletapplication.exception.UnAuthorisedUserException;
 import com.example.walletapplication.exception.UnAuthorisedWalletException;
@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -38,7 +37,7 @@ public class TransactionController {
             Double amount = interTransactionRequestDTO.getAmount();
             Long senderId = interTransactionRequestDTO.getSenderWalletId();
             Long receiverId = interTransactionRequestDTO.getReceiverWalletId();
-            Currency currency = interTransactionRequestDTO.getCurrency();
+            CurrencyType currency = interTransactionRequestDTO.getCurrency();
 
             transactionService.transfer(senderId, receiverId, amount, currency);
             return ResponseEntity.ok("Transfer successful. Amount: " + amount);

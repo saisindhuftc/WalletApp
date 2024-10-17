@@ -1,15 +1,16 @@
 package com.example.walletapplication.entity;
 
-import com.example.walletapplication.enums.Country;
-import com.example.walletapplication.enums.Currency;
+import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "wallets")
 public class Wallet {
@@ -21,13 +22,13 @@ public class Wallet {
     private double balance = 0.0;
 
     @Enumerated(EnumType.STRING)
-    private Currency currency;
+    private CurrencyType currency;
 
-    public Wallet(Country country) {
-        this.currency = country.getCurrency();
+    public Wallet(CurrencyType currency) {
+        this.currency = currency;
     }
 
-    public void deposit(double amount, Currency depositCurrency) throws InvalidAmountException {
+    public void deposit(double amount, CurrencyType depositCurrency) throws InvalidAmountException {
         if (amount <= 0) {
             throw new InvalidAmountException("Deposit amount should be greater than 0");
         }
@@ -35,7 +36,7 @@ public class Wallet {
         this.balance += convertedAmount;
     }
 
-    public void withdraw(double amount, Currency withdrawalCurrency) throws InsufficientBalanceException, InvalidAmountException {
+    public void withdraw(double amount, CurrencyType withdrawalCurrency) throws InsufficientBalanceException, InvalidAmountException {
         if (amount <= 0) {
             throw new InvalidAmountException("Withdrawal amount should be greater than 0");
         }

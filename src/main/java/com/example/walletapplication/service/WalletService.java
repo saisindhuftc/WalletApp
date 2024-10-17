@@ -2,13 +2,11 @@ package com.example.walletapplication.service;
 
 import com.example.walletapplication.entity.IntraTransaction;
 import com.example.walletapplication.entity.User;
-import com.example.walletapplication.entity.Wallet;
-import com.example.walletapplication.enums.Currency;
+import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.enums.TransactionType;
 import com.example.walletapplication.exception.*;
 import com.example.walletapplication.repository.IntraTransactionRepository;
 import com.example.walletapplication.repository.UserRepository;
-import com.example.walletapplication.repository.WalletRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -40,7 +38,7 @@ public class WalletService {
     }
 
     @Transactional
-    public void deposit(Long userId, Double amount, Currency depositCurrency) throws InvalidAmountException {
+    public void deposit(Long userId, Double amount, CurrencyType depositCurrency) throws InvalidAmountException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         user.getWallet().deposit(amount, depositCurrency);
@@ -50,7 +48,7 @@ public class WalletService {
     }
 
     @Transactional
-    public Double withdraw(Long userId, Double amount, Currency withdrawalCurrency) throws InsufficientBalanceException{
+    public Double withdraw(Long userId, Double amount, CurrencyType withdrawalCurrency) throws InsufficientBalanceException{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         user.getWallet().withdraw(amount, withdrawalCurrency);

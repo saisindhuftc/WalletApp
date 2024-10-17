@@ -4,7 +4,7 @@ import com.example.walletapplication.entity.InterTransaction;
 import com.example.walletapplication.entity.IntraTransaction;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.enums.TransactionType;
-import com.example.walletapplication.enums.Currency;
+import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.UserNotFoundException;
 import com.example.walletapplication.repository.InterTransactionRepository;
@@ -31,7 +31,7 @@ public class TransactionService {
     private IntraTransactionRepository intraTransactionRepository;
 
     @Transactional
-    public void transfer(Long senderId, Long receiverId, Double amount, Currency currency) {
+    public void transfer(Long senderId, Long receiverId, Double amount, CurrencyType currency) {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new UserNotFoundException("Sender not found"));
         User receiver = userRepository.findById(receiverId)

@@ -1,79 +1,101 @@
 package com.example.walletapplication.entity;
 
-import com.example.walletapplication.enums.Country;
+import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserTest {
+class UserTest {
 
     @Test
-    public void testUserCreation() {
-        User user = new User("sai", "password456",Country.USA);
-        assertNotNull(user);
+    public void testUserInitialization() {
+        String username = "testUser";
+        String password = "securePassword";
+        CurrencyType currencyType = CurrencyType.INR;
+
+        User user = new User(username, password, currencyType);
+
+        assertEquals(username, user.getUsername());
+        assertEquals(password, user.getPassword());
+        assertNotNull(user.getWallet());
+        assertEquals(currencyType, user.getWallet().getCurrency());
     }
 
     @Test
-    public void testUserAfterCreation() {
-        User user = new User("sai", "password456",Country.USA);
-        assertEquals("sai", user.getUsername());
-        assertEquals("password456", user.getPassword());
-        assertNotNull(user.getWallets());
+    public void testUserWithNullUsername() {
+        String password = "securePassword";
+        CurrencyType currencyType = CurrencyType.INR;
+
+        InvalidUsernameAndPasswordException exception = assertThrows(InvalidUsernameAndPasswordException.class, () -> {
+            new User(null, password, currencyType);
+        });
+        assertEquals("Username and password cannot be null or blank", exception.getMessage());
     }
 
     @Test
-    public void testValidId() {
-        User user = new User("sindhu", "password123",Country.INDIA);
-        assertNull(user.getUserId());
-    }
+    void testUserWithBlankUsername() {
+        String password = "securePassword";
+        CurrencyType currencyType = CurrencyType.INR;
 
-
-    @Test
-    public void testValidUsername() {
-        User user = new User("lahari", "password100",Country.EUROPE);
-        assertEquals("lahari", user.getUsername());
-    }
-
-
-    @Test
-    public void testValidPassword() {
-        User user = new User("nas", "password789",Country.EUROPE);
-        assertEquals("password789", user.getPassword());
+        InvalidUsernameAndPasswordException exception = assertThrows(InvalidUsernameAndPasswordException.class, () -> {
+            new User("  ", password, currencyType);
+        });
+        assertEquals("Username and password cannot be null or blank", exception.getMessage());
     }
 
     @Test
-    public void testUserWallet() {
-        User user = new User("pooji", "password200", Country.INDIA);
-        assertNotNull(user.getWallets());
+    void testUserWithNullPassword() {
+        String username = "testUser";
+        CurrencyType currencyType = CurrencyType.INR;
+
+        InvalidUsernameAndPasswordException exception = assertThrows(InvalidUsernameAndPasswordException.class, () -> {
+            new User(username, null, currencyType);
+        });
+        assertEquals("Username and password cannot be null or blank", exception.getMessage());
     }
 
     @Test
-    public void testTwoUsers() {
-        User user1 = new User("sai", "password456",Country.USA);
-        User user2 = new User("sindhu", "password123",Country.INDIA);
-        assertNotEquals(user1, user2);
+    void testUserWithBlankPassword() {
+        String username = "testUser";
+        CurrencyType currencyType = CurrencyType.INR;
+
+        InvalidUsernameAndPasswordException exception = assertThrows(InvalidUsernameAndPasswordException.class, () -> {
+            new User(username, "  ", currencyType);
+        });
+        assertEquals("Username and password cannot be null or blank", exception.getMessage());
     }
 
     @Test
-    public void testUserUpdateUsernameAndPassword() {
-        User user = new User("nasira", "password254", Country.EUROPE);
-        assertEquals("nasira", user.getUsername());
-        assertEquals("password254", user.getPassword());
+    void testUserWithNullCurrencyType() {
+        String username = "testUser";
+        String password = "securePassword";
+
+        User user = new User(username, password, null);
+
+        assertNotNull(user.getWallet());
+        assertEquals(CurrencyType.INR, user.getWallet().getCurrency());
     }
 
     @Test
-    public void testAddMultipleWallets() {
-        User user = new User("mike", "password987", Country.INDIA);
-        Wallet wallet1 = new Wallet(Country.USA);
-        Wallet wallet2 = new Wallet(Country.EUROPE);
-        user.getWallets().add(wallet1);
-        user.getWallets().add(wallet2);
-        assertEquals(3, user.getWallets().size());
+    public void testUserUpdateNameAndPassword() {
+        User user = new User("username", "password", CurrencyType.USD);
+
+        assertEquals("username", user.getUsername());
+        assertEquals("password", user.getPassword());
     }
 
     @Test
-    public void testPasswordWriteOnly() {
-        User user = new User("writeOnlyUser", "password789", Country.INDIA);
-        assertEquals("password789", user.getPassword());
+    public void testTwoUser() {
+        String userName1 = "sai";
+        String password1 = "Password123";
+        CurrencyType currencyType = CurrencyType.USD;
+        String userName2 = "sindhu";
+        String password2 = "password456";
+        CurrencyType currencyType1 = CurrencyType.USD;
+        User user = new User(userName1, password1, currencyType);
+        User user2 = new User(userName2, password2, currencyType1);
+
+        assertNotEquals(user, user2);
     }
 }

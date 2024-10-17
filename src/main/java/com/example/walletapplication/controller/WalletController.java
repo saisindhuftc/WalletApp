@@ -1,6 +1,6 @@
 package com.example.walletapplication.controller;
 
-import com.example.walletapplication.enums.Currency;
+import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.exception.*;
 import com.example.walletapplication.requestDTO.WalletRequestDTO;
 import com.example.walletapplication.service.UserService;
@@ -26,7 +26,7 @@ public class WalletController {
         try {
             walletService.isUserAuthorized(userId, walletId);
             Double amount = depositRequestDTO.getAmount();
-            Currency currency = depositRequestDTO.getCurrency();
+            CurrencyType currency = depositRequestDTO.getCurrency();
             walletService.deposit(userId, amount, currency);
             return ResponseEntity.ok(amount);
         } catch (UserNotFoundException e) {
@@ -45,7 +45,7 @@ public class WalletController {
         try {
             walletService.isUserAuthorized(userId, walletId);
             Double amount = withdrawRequestDTO.getAmount();
-            Currency currency = withdrawRequestDTO.getCurrency();
+            CurrencyType currency = withdrawRequestDTO.getCurrency();
             Double withdrawAmount = walletService.withdraw(userId, amount, currency);
             return ResponseEntity.ok(withdrawAmount);
         } catch (UserNotFoundException e) {
