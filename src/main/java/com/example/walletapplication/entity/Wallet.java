@@ -2,60 +2,49 @@ package com.example.walletapplication.entity;
 
 import com.example.walletapplication.enums.Country;
 import com.example.walletapplication.enums.Currency;
-import com.example.walletapplication.enums.IntraTransactionType;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
-import com.example.walletapplication.requestModels.InterTransactionRequestModel;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
+@Getter
+@NoArgsConstructor
+@Table(name = "wallets")
 public class Wallet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer walletId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private Money money;
+    private double balance = 0.0;
+
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     public Wallet(Country country) {
-        this.money = new Money(0.0, country.getCurrency());
+        this.currency = country.getCurrency();
     }
 
-    public void deposit(Money money) throws InvalidAmountException {
-        this.money.add(money);
+    public void deposit(double amount, Currency depositCurrency) throws InvalidAmountException {
+        if (amount <= 0) {
+            throw new InvalidAmountException("Deposit amount should be greater than 0");
+        }
+        double convertedAmount = CurrencyConverter.convertMoney(amount, depositCurrency, this.currency);
+        this.balance += convertedAmount;
     }
 
-    public void withdraw(Money money) throws InsufficientBalanceException, InvalidAmountException {
-        this.money.subtract(money);
+    public void withdraw(double amount, Currency withdrawalCurrency) throws InsufficientBalanceException, InvalidAmountException {
+        if (amount <= 0) {
+            throw new InvalidAmountException("Withdrawal amount should be greater than 0");
+        }
+        double convertedAmount = CurrencyConverter.convertMoney(amount, withdrawalCurrency, this.currency);
+
+        if (convertedAmount > this.balance) {
+            throw new InsufficientBalanceException("Insufficient balance");
+        }
+
+        this.balance -= convertedAmount;
     }
-
-    public InterTransaction transact(InterTransactionRequestModel requestModel, User sender, Wallet receiverWallet, User receiver) throws InsufficientBalanceException, InvalidAmountException {
-        Money convertedMoney = CurrencyConverter.convertMoney(requestModel.getMoney(), this.getMoney().getCurrency(), receiverWallet.getMoney().getCurrency());
-
-        this.withdraw(requestModel.getMoney());
-        IntraTransaction withdrawTransaction = new IntraTransaction(
-                new Money(requestModel.getMoney().getAmount(), requestModel.getMoney().getCurrency()),
-                IntraTransactionType.WITHDRAWAL, this, LocalDateTime.now()
-        );
-
-        receiverWallet.deposit(convertedMoney);
-        IntraTransaction depositTransaction = new IntraTransaction(
-                convertedMoney, IntraTransactionType.DEPOSIT, receiverWallet, LocalDateTime.now()
-        );
-
-        return new InterTransaction(
-                sender, this.getWalletId(), receiver, receiverWallet.getWalletId(),
-                depositTransaction, withdrawTransaction
-        );
-    }
-
 }

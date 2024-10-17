@@ -1,6 +1,6 @@
 package com.example.walletapplication.Security;
 
-import com.example.walletapplication.service.CustomUserDetailsService;
+import com.example.walletapplication.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,9 +20,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
+    private final UserService userDetailsService;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(UserService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 

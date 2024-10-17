@@ -1,20 +1,24 @@
 package com.example.walletapplication.entity;
-
 import com.example.walletapplication.enums.Currency;
 
 public class CurrencyConverter {
 
-    // Convert from sourceCurrency to targetCurrency
-    public static Money convertMoney(Money money, Currency sourceCurrency, Currency targetCurrency) {
-        // Conversion factor from source currency to target currency
-        double sourceToBaseRate = sourceCurrency.getConversionFactor();  // Convert to base (INR)
-        double targetToBaseRate = targetCurrency.getConversionFactor();  // Convert to target
+    // Convert an amount from sourceCurrency to targetCurrency
+    public static double convertMoney(double amount, Currency sourceCurrency, Currency targetCurrency) {
+        if (sourceCurrency == targetCurrency) {
+            // No conversion needed if both currencies are the same
+            return amount;
+        }
+        // Conversion factor from source currency to base currency (e.g., INR)
+        double sourceToBaseRate = sourceCurrency.getConversionFactor();
+        // Conversion factor from target currency to base currency
+        double baseToTargetRate = targetCurrency.getConversionFactor();
 
-        // Calculate the equivalent amount in the target currency
-        double amountInBaseCurrency = money.getAmount() / sourceToBaseRate;  // Convert to base currency (INR)
-        double amountInTargetCurrency = amountInBaseCurrency * targetToBaseRate;  // Convert to target currency
+        // Calculate the equivalent amount in the base currency
+        double amountInBaseCurrency = amount * sourceToBaseRate;  // Convert to base currency (e.g., INR)
+        // Convert the base currency amount to target currency
+        double amountInTargetCurrency = amountInBaseCurrency / baseToTargetRate;
 
-        // Return a new Money object with the converted amount and target currency
-        return new Money(amountInTargetCurrency, targetCurrency);
+        return amountInTargetCurrency;
     }
 }

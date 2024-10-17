@@ -36,7 +36,7 @@ class IntraTransactionServiceTest {
     private IntraTransactionRepository intraTransactionRepository;
 
     @InjectMocks
-    private IntraTransactionService intraTransactionService;
+    private TransactionService intraTransactionService;
 
     @Mock
     private SecurityContext securityContext;

@@ -3,7 +3,7 @@ package com.example.walletapplication.controller;
 import com.example.walletapplication.exception.SameWalletsForTransactionException;
 import com.example.walletapplication.exception.UserNotFoundException;
 import com.example.walletapplication.exception.WalletNotFoundException;
-import com.example.walletapplication.requestModels.InterTransactionRequestModel;
+import com.example.walletapplication.requestDTO.InterTransactionRequestDTO;
 import com.example.walletapplication.responseModels.InterTransactionResponseModel;
 import com.example.walletapplication.service.InterTransactionService;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,13 +32,13 @@ public class InterTransactionControllerTest {
 
     @Test
     public void testTransactSuccess() throws Exception {
-        InterTransactionRequestModel requestModel = new InterTransactionRequestModel();
+        InterTransactionRequestDTO requestModel = new InterTransactionRequestDTO();
         InterTransactionResponseModel responseModel = new InterTransactionResponseModel();
 
-        when(interTransactionService.transact(any(InterTransactionRequestModel.class)))
+        when(interTransactionService.transact(any(InterTransactionRequestDTO.class)))
                 .thenReturn(responseModel);
 
-        ResponseEntity<?> responseEntity = interTransactionController.transact(requestModel);
+        ResponseEntity<?> responseEntity = interTransactionController.transfer(requestModel);
 
         assertEquals(HttpStatus.ACCEPTED, responseEntity.getStatusCode());
         assertEquals(responseModel, responseEntity.getBody());
@@ -47,12 +47,12 @@ public class InterTransactionControllerTest {
 
     @Test
     public void testTransactWalletNotFound() throws Exception {
-        InterTransactionRequestModel requestModel = new InterTransactionRequestModel();
+        InterTransactionRequestDTO requestModel = new InterTransactionRequestDTO();
 
-        when(interTransactionService.transact(any(InterTransactionRequestModel.class)))
+        when(interTransactionService.transact(any(InterTransactionRequestDTO.class)))
                 .thenThrow(new WalletNotFoundException("Wallet not found"));
 
-        ResponseEntity<?> responseEntity = interTransactionController.transact(requestModel);
+        ResponseEntity<?> responseEntity = interTransactionController.transfer(requestModel);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals("Wallet not found", responseEntity.getBody());
@@ -61,12 +61,12 @@ public class InterTransactionControllerTest {
 
     @Test
     public void testTransactSameWalletsForTransaction() throws Exception {
-        InterTransactionRequestModel requestModel = new InterTransactionRequestModel();
+        InterTransactionRequestDTO requestModel = new InterTransactionRequestDTO();
 
-        when(interTransactionService.transact(any(InterTransactionRequestModel.class)))
+        when(interTransactionService.transact(any(InterTransactionRequestDTO.class)))
                 .thenThrow(new SameWalletsForTransactionException("Cannot transact between the same wallets"));
 
-        ResponseEntity<?> responseEntity = interTransactionController.transact(requestModel);
+        ResponseEntity<?> responseEntity = interTransactionController.transfer(requestModel);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertEquals("Cannot transact between the same wallets", responseEntity.getBody());
@@ -75,12 +75,12 @@ public class InterTransactionControllerTest {
 
     @Test
     public void testTransactUserNotFound() throws Exception {
-        InterTransactionRequestModel requestModel = new InterTransactionRequestModel();
+        InterTransactionRequestDTO requestModel = new InterTransactionRequestDTO();
 
-        when(interTransactionService.transact(any(InterTransactionRequestModel.class)))
+        when(interTransactionService.transact(any(InterTransactionRequestDTO.class)))
                 .thenThrow(new UserNotFoundException("User not found"));
 
-        ResponseEntity<?> responseEntity = interTransactionController.transact(requestModel);
+        ResponseEntity<?> responseEntity = interTransactionController.transfer(requestModel);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals("User not found", responseEntity.getBody());

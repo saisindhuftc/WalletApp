@@ -1,40 +1,33 @@
 package com.example.walletapplication.entity;
 
-import com.example.walletapplication.enums.Country;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Data
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "users")
+@Getter
 public class User {
+    public User(){
+    }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Country country;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Wallet wallet;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "USERID")
-    private List<Wallet> wallets = new ArrayList<>();
-
-    public User(String username, String password, Country country) {
+    public User(String username, String password) {
+        if(username == null || password == null || username.isBlank() || password.isBlank()) {
+            throw new InvalidUsernameAndPasswordException("Username and password cannot be null or blank");
+        }
         this.username = username;
         this.password = password;
-        this.wallets.add(new Wallet(country));
+        this.wallet = new Wallet();
     }
 }

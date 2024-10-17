@@ -1,23 +1,18 @@
 package com.example.walletapplication.service;
 
 import com.example.walletapplication.entity.Money;
-import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
 import com.example.walletapplication.enums.Currency;
 import com.example.walletapplication.exception.AuthenticationFailedException;
-import com.example.walletapplication.exception.UserNotFoundException;
-import com.example.walletapplication.repository.IntraTransactionRepository;
 import com.example.walletapplication.repository.UserRepository;
 import com.example.walletapplication.repository.WalletRepository;
-import com.example.walletapplication.requestModels.WalletRequestModel;
+import com.example.walletapplication.requestDTO.WalletRequestModel;
 import com.example.walletapplication.responseModels.WalletResponseModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 

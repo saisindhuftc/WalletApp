@@ -3,7 +3,7 @@ package com.example.walletapplication.service;
 import com.example.walletapplication.entity.*;
 import com.example.walletapplication.exception.*;
 import com.example.walletapplication.repository.*;
-import com.example.walletapplication.requestModels.InterTransactionRequestModel;
+import com.example.walletapplication.requestDTO.InterTransactionRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -49,7 +49,7 @@ class InterTransactionServiceTest {
     public void testTransactUserNotFound() {
         String username = "testUser";
         String receiverName = "receiverUser";
-        InterTransactionRequestModel requestModel = new InterTransactionRequestModel();
+        InterTransactionRequestDTO requestModel = new InterTransactionRequestDTO();
         requestModel.setReceiverName(receiverName);
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -67,7 +67,7 @@ class InterTransactionServiceTest {
         sender.setUsername(username);
         User receiver = new User();
         receiver.setUsername(receiverName);
-        InterTransactionRequestModel requestModel = new InterTransactionRequestModel();
+        InterTransactionRequestDTO requestModel = new InterTransactionRequestDTO();
         requestModel.setSenderWalletId(1);
         requestModel.setReceiverWalletId(2);
         requestModel.setReceiverName(receiverName);
@@ -90,7 +90,7 @@ class InterTransactionServiceTest {
         User receiver = new User();
         receiver.setUsername(receiverName);
         Wallet senderWallet = new Wallet();
-        InterTransactionRequestModel requestModel = new InterTransactionRequestModel();
+        InterTransactionRequestDTO requestModel = new InterTransactionRequestDTO();
         requestModel.setSenderWalletId(1);
         requestModel.setReceiverWalletId(2);
         requestModel.setReceiverName(receiverName);
@@ -113,7 +113,7 @@ class InterTransactionServiceTest {
         sender.setUsername(username);
         User receiver = new User();
         receiver.setUsername(receiverName);
-        InterTransactionRequestModel requestModel = new InterTransactionRequestModel();
+        InterTransactionRequestDTO requestModel = new InterTransactionRequestDTO();
         requestModel.setSenderWalletId(1);
         requestModel.setReceiverWalletId(2);
         requestModel.setReceiverName(receiverName);
@@ -133,7 +133,7 @@ class InterTransactionServiceTest {
         String receiverName = "receiverUser";
         User sender = new User();
         sender.setUsername(username);
-        InterTransactionRequestModel requestModel = new InterTransactionRequestModel();
+        InterTransactionRequestDTO requestModel = new InterTransactionRequestDTO();
         requestModel.setSenderWalletId(1);
         requestModel.setReceiverWalletId(2);
         requestModel.setReceiverName(receiverName);

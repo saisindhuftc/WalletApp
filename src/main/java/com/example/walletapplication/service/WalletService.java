@@ -3,76 +3,60 @@ package com.example.walletapplication.service;
 import com.example.walletapplication.entity.IntraTransaction;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
-import com.example.walletapplication.enums.IntraTransactionType;
-import com.example.walletapplication.exception.AuthenticationFailedException;
-import com.example.walletapplication.exception.InsufficientBalanceException;
-import com.example.walletapplication.exception.InvalidAmountException;
-import com.example.walletapplication.exception.WalletNotFoundException;
+import com.example.walletapplication.enums.Currency;
+import com.example.walletapplication.enums.TransactionType;
+import com.example.walletapplication.exception.*;
 import com.example.walletapplication.repository.IntraTransactionRepository;
 import com.example.walletapplication.repository.UserRepository;
 import com.example.walletapplication.repository.WalletRepository;
-import com.example.walletapplication.requestModels.WalletRequestModel;
-import com.example.walletapplication.responseModels.WalletResponseModel;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Service
 public class WalletService {
 
-    @Autowired
-    private WalletRepository walletReposiotry;
+    private final UserRepository userRepository;
+    private final IntraTransactionRepository intraTransactionRepository;
 
-    @Autowired
-    private UserRepository userReposiotry;
-
-    @Autowired
-    private IntraTransactionRepository intraTransactionRepository;
-
-    public WalletService(WalletRepository walletReposiotry, UserRepository userReposiotry, IntraTransactionRepository intraTransactionRepository) {
-        this.walletReposiotry = walletReposiotry;
-        this.userReposiotry = userReposiotry;
+    public WalletService(UserRepository userRepository, IntraTransactionRepository intraTransactionRepository) {
+        this.userRepository = userRepository;
         this.intraTransactionRepository = intraTransactionRepository;
-
     }
 
-    public List<WalletResponseModel> getAllWallets() {
-        List<Wallet> wallets = walletReposiotry.findAll();
-        List<WalletResponseModel> response = new ArrayList<>();
-        for(Wallet wallet : wallets){
-            response.add(new WalletResponseModel(wallet.getWalletId(), wallet.getMoney()));
+    public void isUserAuthorized(Long userId, Long walletId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUsername = authentication.getName();
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        if (!user.getUsername().equals(authenticatedUsername)){
+            throw new UnAuthorisedUserException("User not authorized");
         }
-        return response;
+        if(!user.getWallet().getId().equals(walletId)) {
+            throw new UnAuthorisedWalletException("User not authorized for this Wallet");
+        }
     }
 
-    public WalletResponseModel deposit(int walletId, String username, WalletRequestModel requestModel) throws InvalidAmountException, AuthenticationFailedException, WalletNotFoundException {
-        User user = userReposiotry.findByUsername(username).orElseThrow(() -> new AuthenticationFailedException("Username or password does not match."));
-        Wallet wallet = walletReposiotry.findById(walletId).orElseThrow(() -> new WalletNotFoundException("Wallet id does not match."));
-        if(!user.getWallets().contains(wallet))
-            throw new AuthenticationFailedException("Wallet id does not match.");
+    @Transactional
+    public void deposit(Long userId, Double amount, Currency depositCurrency) throws InvalidAmountException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.getWallet().deposit(amount, depositCurrency);
 
-        wallet.deposit(requestModel.getMoney());
-
-        walletReposiotry.save(wallet);
-        intraTransactionRepository.save(new IntraTransaction(requestModel.getMoney(), IntraTransactionType.DEPOSIT, wallet, LocalDateTime.now()));
-        return new WalletResponseModel(walletId, wallet.getMoney());
+        IntraTransaction transaction = new IntraTransaction(user.getWallet(), TransactionType.DEPOSIT, amount, LocalDateTime.now());
+        intraTransactionRepository.save(transaction);
     }
 
-    public WalletResponseModel withdraw(int walletId, String username, WalletRequestModel requestModel) throws InsufficientBalanceException, InvalidAmountException, AuthenticationFailedException, WalletNotFoundException {
-        User user = userReposiotry.findByUsername(username).orElseThrow(() -> new AuthenticationFailedException("Username or password does not match."));
-        Wallet wallet = walletReposiotry.findById(walletId).orElseThrow(() -> new WalletNotFoundException("Wallet id does not match."));
-        if(!user.getWallets().contains(wallet))
-            throw new AuthenticationFailedException("Wallet id does not match.");
+    @Transactional
+    public Double withdraw(Long userId, Double amount, Currency withdrawalCurrency) throws InsufficientBalanceException{
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.getWallet().withdraw(amount, withdrawalCurrency);
 
-        wallet.withdraw(requestModel.getMoney());
-
-        walletReposiotry.save(wallet);
-        intraTransactionRepository.save(new IntraTransaction(requestModel.getMoney(), IntraTransactionType.WITHDRAWAL, wallet, LocalDateTime.now()));
-        return new WalletResponseModel(walletId, wallet.getMoney());
+        IntraTransaction transaction = new IntraTransaction(user.getWallet(), TransactionType.WITHDRAWAL, amount, LocalDateTime.now());
+        intraTransactionRepository.save(transaction);
+        return amount;
     }
-
 }

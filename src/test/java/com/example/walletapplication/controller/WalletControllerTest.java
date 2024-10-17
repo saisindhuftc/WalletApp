@@ -1,6 +1,6 @@
 package com.example.walletapplication.controller;
 
-import com.example.walletapplication.requestModels.WalletRequestModel;
+import com.example.walletapplication.requestDTO.WalletRequestModel;
 import com.example.walletapplication.responseModels.WalletResponseModel;
 import com.example.walletapplication.service.WalletService;
 import org.junit.jupiter.api.BeforeEach;

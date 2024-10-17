@@ -1,9 +1,12 @@
 package com.example.walletapplication.entity;
 
+import com.example.walletapplication.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -12,32 +15,29 @@ import lombok.NoArgsConstructor;
 public class InterTransaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int interWalletTransactionId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private User sender;
+    @ManyToOne
+    @JoinColumn(name = "sender_wallet_id", nullable = false)
+    private Wallet senderWallet;
 
-    private int senderWalletId;
+    @ManyToOne
+    @JoinColumn(name = "reciever_wallet_id", nullable = false)
+    private Wallet receiverWallet;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private User receiver;
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
 
-    private int receiverWalletId;
+    private double amount;
 
+    private LocalDateTime timestamp;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private IntraTransaction deposit;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    private IntraTransaction withdrawal;
-
-    public InterTransaction(User sender, int senderWalletId, User receiver, int receiverWalletId,IntraTransaction deposit, IntraTransaction withdrawal) {
-        this.sender = sender;
-        this.senderWalletId = senderWalletId;
-        this.receiver = receiver;
-        this.receiverWalletId = receiverWalletId;
-        this.deposit = deposit;
-        this.withdrawal = withdrawal;
+    public InterTransaction(Wallet senderWallet, Wallet receiverWallet, TransactionType transactionType, double amount, LocalDateTime timestamp) {
+        this.senderWallet = senderWallet;
+        this.receiverWallet = receiverWallet;
+        this.transactionType = transactionType;
+        this.amount = amount;
+        this.timestamp = timestamp;
     }
 }

@@ -2,7 +2,7 @@ package com.example.walletapplication.controller;
 
 import com.example.walletapplication.exception.TransactionNotFoundException;
 import com.example.walletapplication.responseModels.TransactionsResponseModel;
-import com.example.walletapplication.service.IntraTransactionService;
+import com.example.walletapplication.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,14 +20,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(IntraTransactionController.class)
+@WebMvcTest(TransactionController.class)
 public class IntraTransactionControllerTest {
 
     @MockBean
-    private IntraTransactionService intraTransactionService;
+    private TransactionService intraTransactionService;
 
     @InjectMocks
-    private IntraTransactionController intraTransactionController;
+    private TransactionController intraTransactionController;
 
     private MockMvc mockMvc;
 
