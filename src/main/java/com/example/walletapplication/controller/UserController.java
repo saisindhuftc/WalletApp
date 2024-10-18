@@ -18,11 +18,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping("")
     public ResponseEntity<?> register(@RequestBody UserRequestDTO userRequestModel) {
         try {
             String username = userRequestModel.getUserName();
             String password = userRequestModel.getPassword();
+            System.out.println("username: " + username);
+            System.out.println("password: " + password);
             User user = userService.register(username, password);
             return ResponseEntity.ok(user);
         } catch (InvalidUsernameAndPasswordException e) {
@@ -32,7 +34,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/{id}/delete")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         try {
             String response = userService.delete(userId);
@@ -44,7 +46,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getUserDetails(@PathVariable String username) {
         try {
             UserDetails userDetails = userService.loadUserByUsername(username);
@@ -55,4 +57,5 @@ public class UserController {
             return ResponseEntity.internalServerError().body("An error occurred: " + e.getMessage());
         }
     }
+
 }

@@ -12,7 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -26,13 +26,12 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-    // Define the Security Filter Chain
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for testing, enable in production as needed
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST,"/api/v1/users/register", "/api/v1/users/login").permitAll()  // Allow open access to register and login
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()  // Allow open access to register
                         .anyRequest().authenticated()  // All other requests require authentication
                 )
                 .sessionManagement(session -> session
@@ -43,22 +42,19 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Define a PasswordEncoder (BCrypt in this case)
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();  // Use BCrypt for password encoding
+        return NoOpPasswordEncoder.getInstance();
     }
 
-    // Define the custom AuthenticationProvider
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);  // Set the custom UserDetailsService
-        authProvider.setPasswordEncoder(passwordEncoder());  // Set the password encoder
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
-    // Define the AuthenticationManager to use the custom AuthenticationProvider
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

@@ -4,7 +4,7 @@ import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.exception.*;
 import com.example.walletapplication.requestDTO.WalletRequestDTO;
 import com.example.walletapplication.service.UserService;
-import com.example.walletapplication.service.WalletService;
+import com.example.walletapplication.service.IntraTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("users/{userId}/wallets/{walletId}")
-public class WalletController {
+public class IntraTransactionController {
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private WalletService walletService;
+    private IntraTransactionService walletService;
 
-    @PostMapping("/{walletId}/deposit")
+    @PostMapping("/deposits")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deposit(@PathVariable Long userId, @PathVariable Long walletId, @RequestBody WalletRequestDTO depositRequestDTO) {
         try {
@@ -40,7 +40,7 @@ public class WalletController {
         }
     }
 
-    @PostMapping("/{walletId}/withdrawl")
+    @PostMapping("/withdrawls")
     public ResponseEntity<?> withdraw(@PathVariable Long userId, @PathVariable Long walletId, @RequestBody WalletRequestDTO withdrawRequestDTO) {
         try {
             walletService.isUserAuthorized(userId, walletId);

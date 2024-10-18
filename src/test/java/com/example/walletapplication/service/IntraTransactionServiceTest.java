@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class TransactionServiceTest {
+public class IntraTransactionServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -37,7 +38,7 @@ public class TransactionServiceTest {
     private IntraTransactionRepository intraTransactionRepository;
 
     @InjectMocks
-    private TransactionService transactionService;
+    private InterTransactionService transactionService;
 
     @BeforeEach
     void setUp() {
@@ -127,4 +128,28 @@ public class TransactionServiceTest {
         assertEquals(1, result.size());
         assertEquals(type, result.get(0).getType());
     }
+
+    @Test
+    public void testGetTransactionHistoryByType2() {
+        Long walletId = 1L;
+        TransactionType transactionType = TransactionType.DEPOSIT;
+
+        Wallet senderWallet = new Wallet(CurrencyType.USD);
+        Wallet receiverWallet = new Wallet(CurrencyType.EUR);
+
+        List<IntraTransaction> transactions = new ArrayList<>();
+        transactions.add(new IntraTransaction(senderWallet, transactionType, 100.0, LocalDateTime.now()));
+        transactions.add(new IntraTransaction(senderWallet, transactionType, 150.0, LocalDateTime.now()));
+
+        when(intraTransactionRepository.findByWalletId(walletId, transactionType)).thenReturn(transactions);
+
+        List<IntraTransaction> result = transactionService.getTransactionHistoryByType(walletId, transactionType);
+
+        assertEquals(2, result.size());
+        assertEquals(transactions.get(0).getAmount(), result.get(0).getAmount());
+        assertEquals(transactions.get(1).getAmount(), result.get(1).getAmount());
+
+        verify(intraTransactionRepository, times(1)).findByWalletId(walletId, transactionType);
+    }
+
 }

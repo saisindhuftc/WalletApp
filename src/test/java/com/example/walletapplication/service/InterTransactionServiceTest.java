@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class WalletServiceTest {
+class InterTransactionServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -31,7 +31,7 @@ class WalletServiceTest {
     private IntraTransactionRepository intraTransactionRepository;
 
     @InjectMocks
-    private WalletService walletService;
+    private IntraTransactionService walletService;
 
     private User user;
     private Wallet wallet;

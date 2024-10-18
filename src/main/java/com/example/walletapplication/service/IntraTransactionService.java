@@ -15,12 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
-public class WalletService {
+public class IntraTransactionService {
 
     private final UserRepository userRepository;
     private final IntraTransactionRepository intraTransactionRepository;
 
-    public WalletService(UserRepository userRepository, IntraTransactionRepository intraTransactionRepository) {
+    public IntraTransactionService(UserRepository userRepository, IntraTransactionRepository intraTransactionRepository) {
         this.userRepository = userRepository;
         this.intraTransactionRepository = intraTransactionRepository;
     }
