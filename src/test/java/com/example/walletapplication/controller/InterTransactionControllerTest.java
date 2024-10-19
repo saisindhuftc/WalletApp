@@ -54,10 +54,12 @@ class InterTransactionControllerTest {
     public void testTransferSuccess() throws Exception {
         InterTransactionRequestDTO requestDTO = new InterTransactionRequestDTO();
         requestDTO.setAmount(100.0);
+        requestDTO.setSenderWalletId(1L);
+        requestDTO.setReceiverWalletId(2L);
         requestDTO.setCurrency(CurrencyType.USD);
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/users/1/wallets/2/transfer")
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/{userId}/wallets/{walletId}/transactions", 1L, 2L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequestBody))
                 .andExpect(status().isOk())
@@ -66,7 +68,6 @@ class InterTransactionControllerTest {
         verify(transactionService, times(1)).transfer(1L, 2L, 100.0, CurrencyType.USD);
         verify(walletService, times(1)).isUserAuthorized(1L, 2L);
     }
-
 
     @Test
     @WithMockUser

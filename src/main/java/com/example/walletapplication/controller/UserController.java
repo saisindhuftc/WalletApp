@@ -3,12 +3,11 @@ package com.example.walletapplication.controller;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
 import com.example.walletapplication.exception.UnAuthorisedUserException;
+import com.example.walletapplication.exception.UserNotFoundException;
 import com.example.walletapplication.requestDTO.UserRequestDTO;
 import com.example.walletapplication.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,12 +19,10 @@ public class UserController {
 
     @PostMapping("")
     public ResponseEntity<?> register(@RequestBody UserRequestDTO userRequestModel) {
+        String username = userRequestModel.getUsername();
+        String password = userRequestModel.getPassword();
         try {
-            String username = userRequestModel.getUserName();
-            String password = userRequestModel.getPassword();
-            System.out.println("username: " + username);
-            System.out.println("password: " + password);
-            User user = userService.register(username, password);
+            User user = userService.registerUser(username, password, null);
             return ResponseEntity.ok(user);
         } catch (InvalidUsernameAndPasswordException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -34,25 +31,15 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        try {
-            String response = userService.delete(userId);
-            return ResponseEntity.ok(response);
-        } catch (UnAuthorisedUserException e) {
-            return ResponseEntity.status(403).body("User not authorized");
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("An error occurred: " + e.getMessage());
-        }
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserDetails(@PathVariable String username) {
+    public ResponseEntity<?> getUserDetails(@PathVariable Long id) {
         try {
-            UserDetails userDetails = userService.loadUserByUsername(username);
-            return ResponseEntity.ok(userDetails);
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            User user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (UnAuthorisedUserException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("An error occurred: " + e.getMessage());
         }

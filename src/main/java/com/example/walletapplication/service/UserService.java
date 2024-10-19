@@ -1,8 +1,8 @@
 package com.example.walletapplication.service;
 
 import com.example.walletapplication.entity.User;
+import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
-import com.example.walletapplication.exception.UserNotFoundException;
 import com.example.walletapplication.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,31 +12,31 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+
 @Service
 public class UserService implements UserDetailsService {
-
-    private final UserRepository userRepository;
-
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Transactional
-    public User register(String username, String password) {
+    public User registerUser(String username, String password, CurrencyType currencyType) {
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
+            logger.error("Invalid username or password");
             throw new InvalidUsernameAndPasswordException("Username and password cannot be empty");
         }
-        return userRepository.save(new User(username, password,null));
+        User user = new User(username, password, currencyType);
+        User savedUser = userRepository.save(user);
+        logger.info("User registered successfully: {}", username);
+        return savedUser;
     }
 
-    public String delete(Long userId) throws UserNotFoundException {
-        User userToDelete = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User could not be found."));
-
-        userRepository.delete(userToDelete);
-        return "User deleted successfully.";
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -49,9 +49,10 @@ public class UserService implements UserDetailsService {
                 });
 
         logger.info("User found: {}", username);
-        return org.springframework.security.core.userdetails.User.withUsername(user.getUsername())
-                .password(user.getPassword())
-                .authorities("USER")
-                .build();
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                Collections.singletonList(() -> "ROLE_USER")
+        );
     }
 }

@@ -2,7 +2,6 @@ package com.example.walletapplication.controller;
 
 
 import com.example.walletapplication.enums.CurrencyType;
-import com.example.walletapplication.enums.TransactionType;
 import com.example.walletapplication.exception.UnAuthorisedUserException;
 import com.example.walletapplication.exception.UnAuthorisedWalletException;
 import com.example.walletapplication.exception.UserNotFoundException;
