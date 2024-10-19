@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(IntraTransactionController.class)
+@WebMvcTest(IntraWalletTransactionController.class)
 public class IntraTransactionControllerTest {
 
     @Autowired
@@ -32,7 +32,7 @@ public class IntraTransactionControllerTest {
     private UserService userService;
 
     @InjectMocks
-    private IntraTransactionController intraTransactionController;
+    private IntraWalletTransactionController intraTransactionController;
 
     @Autowired
     private ObjectMapper objectMapper;

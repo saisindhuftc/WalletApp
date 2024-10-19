@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("users/{userId}/wallets/{walletId}")
-public class IntraTransactionController {
+public class IntraWalletTransactionController {
 
     @Autowired
     private UserService userService;

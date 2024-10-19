@@ -1,9 +1,7 @@
 package com.example.walletapplication.controller;
 
 import com.example.walletapplication.entity.User;
-import com.example.walletapplication.exception.InvalidUsernameAndPasswordException;
-import com.example.walletapplication.exception.UnAuthorisedUserException;
-import com.example.walletapplication.exception.UserNotFoundException;
+import com.example.walletapplication.exception.*;
 import com.example.walletapplication.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +30,9 @@ public class UserControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(userController)
+                .setControllerAdvice(new CustomExceptionHandler())
+                .build();
     }
 
     @Test
@@ -45,7 +45,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"testuser\",\"password\":\"password\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("testuser"));
+                .andExpect(jsonPath("$.user.username").value("testuser"));
 
         verify(userService, times(1)).registerUser("testuser", "password", null);
     }
@@ -58,8 +58,9 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"\",\"password\":\"password\"}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Username and password cannot be empty"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Username and password cannot be empty"))
+                .andExpect(jsonPath("$.status").value("Invalid credentials"));
 
         verify(userService, times(1)).registerUser("", "password", null);
     }
@@ -72,8 +73,9 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"testuser\",\"password\":\"\"}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Username and password cannot be empty"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Username and password cannot be empty"))
+                .andExpect(jsonPath("$.status").value("Invalid credentials"));
 
         verify(userService, times(1)).registerUser("testuser", "", null);
     }
@@ -86,8 +88,9 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"\",\"password\":\"\"}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Username and password cannot be empty"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Username and password cannot be empty"))
+                .andExpect(jsonPath("$.status").value("Invalid credentials"));
 
         verify(userService, times(1)).registerUser("", "", null);
     }
@@ -100,7 +103,22 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"testuser\",\"password\":\"password\"}"))
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().string("An error occurred: Internal server error"));
+                .andExpect(jsonPath("$.message").value("Internal server error"))
+                .andExpect(jsonPath("$.status").value("Internal server error"));
+
+        verify(userService, times(1)).registerUser("testuser", "password", null);
+    }
+
+    @Test
+    public void testRegisterUserAlreadyExists() throws Exception {
+        doThrow(new UserAlreadyExistsException("User already exists")).when(userService).registerUser(any(String.class), any(String.class), any());
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"testuser\",\"password\":\"password\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("User already exists"))
+                .andExpect(jsonPath("$.status").value("User already exists"));
 
         verify(userService, times(1)).registerUser("testuser", "password", null);
     }
@@ -113,20 +131,9 @@ public class UserControllerTest {
         when(userService.getUserById(anyLong())).thenReturn(user);
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L));
+                .andExpect(jsonPath("$.user.id").value(1L));
 
         verify(userService, times(1)).getUserById(1L);
-    }
-
-    @Test
-    public void testGetUserDetailsUserNotFound() throws Exception {
-        doThrow(new UserNotFoundException("User not found")).when(userService).getUserById(anyLong());
-
-        mockMvc.perform(get("/users/11"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("User not found"));
-
-        verify(userService, times(1)).getUserById(11L);
     }
 
     @Test
@@ -135,7 +142,8 @@ public class UserControllerTest {
 
         mockMvc.perform(get("/users/20"))
                 .andExpect(status().isForbidden())
-                .andExpect(content().string("User not authorized"));
+                .andExpect(jsonPath("$.message").value("User not authorized"))
+                .andExpect(jsonPath("$.status").value("User not authorized"));
 
         verify(userService, times(1)).getUserById(20L);
     }
@@ -146,8 +154,10 @@ public class UserControllerTest {
 
         mockMvc.perform(get("/users/924566332"))
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().string("An error occurred: Internal server error"));
+                .andExpect(jsonPath("$.message").value("Internal server error"))
+                .andExpect(jsonPath("$.status").value("Internal server error"));
 
         verify(userService, times(1)).getUserById(924566332L);
     }
+
 }

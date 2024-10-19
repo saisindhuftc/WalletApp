@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("users/{userId}/wallets/{walletId}")
 @CrossOrigin
-public class InterTransactionController {
+public class InterWalletTransactionController {
 
     @Autowired
     private UserService userService;
