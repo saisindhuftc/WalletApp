@@ -104,4 +104,21 @@ public class CustomExceptionHandler {
         ));
     }
 
+    @ExceptionHandler(WalletNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleWalletNotFoundException(WalletNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "message", e.getMessage(),
+                "status", "Wallet not found"
+        ));
+    }
+
+    @ExceptionHandler(UserAndWalletMismatchException.class)
+    public ResponseEntity<Map<String, String>> handleUserAndWalletMismatchException(UserAndWalletMismatchException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                "message", e.getMessage(),
+                "status", "User and wallet mismatch"
+        ));
+    }
+
+
 }

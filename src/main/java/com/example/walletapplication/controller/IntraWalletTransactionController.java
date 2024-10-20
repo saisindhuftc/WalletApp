@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("users/{userId}")
+@RequestMapping("users/{userId}/wallets/{walletId}")
 public class IntraWalletTransactionController {
 
     @Autowired
@@ -23,7 +23,7 @@ public class IntraWalletTransactionController {
     @Autowired
     private IntraWalletTransactionService walletService;
 
-    @PostMapping("/wallets/{walletId}/deposits")
+    @PostMapping("/deposits")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deposit(@PathVariable Long userId, @PathVariable Long walletId, @RequestBody IntraWalletTransactionRequestDTO depositRequest) {
         walletService.isUserAuthorized(userId, walletId);
@@ -37,7 +37,7 @@ public class IntraWalletTransactionController {
         ));
     }
 
-    @PostMapping("/wallets/{walletId}/withdrawals")
+    @PostMapping("/withdrawals")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> withdraw(@PathVariable Long userId, @PathVariable Long walletId, @RequestBody IntraWalletTransactionRequestDTO withdrawRequest) {
         walletService.isUserAuthorized(userId, walletId);
@@ -51,7 +51,7 @@ public class IntraWalletTransactionController {
         ));
     }
 
-    @GetMapping("/wallets/{walletId}/deposits")
+    @GetMapping("/deposits")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<IntraWalletTransaction>> getDeposits(@PathVariable Long userId, @PathVariable Long walletId) {
         walletService.isUserAuthorized(userId, walletId);
@@ -59,7 +59,7 @@ public class IntraWalletTransactionController {
         return ResponseEntity.ok(deposits);
     }
 
-    @GetMapping("/wallets/{walletId}/withdrawals")
+    @GetMapping("/withdrawals")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<IntraWalletTransaction>> getWithdrawals(@PathVariable Long userId, @PathVariable Long walletId) {
         walletService.isUserAuthorized(userId, walletId);

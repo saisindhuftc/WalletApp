@@ -10,8 +10,10 @@ import lombok.*;
 @Getter
 @Setter
 public class User {
-    public User(){
+    public User() {
+        this.currencyType = CurrencyType.INR;
     }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,12 +27,17 @@ public class User {
     private Wallet wallet;
 
     public User(String username, String password, CurrencyType currencyType) {
-        if(username == null || password == null || username.isBlank() || password.isBlank()) {
+        if (username == null || password == null || username.isBlank() || password.isBlank()) {
             throw new InvalidUsernameAndPasswordException("Username and password cannot be null or blank");
         }
         this.username = username;
         this.password = password;
-        if(currencyType == null) currencyType = CurrencyType.INR;
-        this.wallet = new Wallet(currencyType);
+        // Set the default currency type if not provided
+        if(currencyType == null) {
+            this.currencyType = CurrencyType.INR;
+        } else {
+            this.currencyType = currencyType;
+        }
+        this.wallet = new Wallet(this.currencyType);
     }
 }
