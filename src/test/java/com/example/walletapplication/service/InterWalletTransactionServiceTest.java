@@ -1,11 +1,11 @@
 package com.example.walletapplication.service;
 
-import com.example.walletapplication.entity.IntraTransaction;
+import com.example.walletapplication.entity.IntraWalletTransaction;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.entity.Wallet;
 import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.exception.*;
-import com.example.walletapplication.repository.IntraTransactionRepository;
+import com.example.walletapplication.repository.IntraWalletTransactionRepository;
 import com.example.walletapplication.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,16 +22,16 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class InterTransactionServiceTest {
+class InterWalletTransactionServiceTest {
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
-    private IntraTransactionRepository intraTransactionRepository;
+    private IntraWalletTransactionRepository intraTransactionRepository;
 
     @InjectMocks
-    private IntraTransactionService walletService;
+    private IntraWalletTransactionService walletService;
 
     private User user;
     private Wallet wallet;
@@ -67,7 +67,7 @@ class InterTransactionServiceTest {
 
         assertDoesNotThrow(() -> walletService.deposit(1L, 100.0, CurrencyType.USD));
         assertEquals(100.0, wallet.getBalance());
-        verify(intraTransactionRepository, times(1)).save(any(IntraTransaction.class));
+        verify(intraTransactionRepository, times(1)).save(any(IntraWalletTransaction.class));
     }
 
     @Test
@@ -84,7 +84,7 @@ class InterTransactionServiceTest {
 
         assertDoesNotThrow(() -> walletService.withdraw(1L, 50.0, CurrencyType.USD));
         assertEquals(50.0, wallet.getBalance());
-        verify(intraTransactionRepository, times(1)).save(any(IntraTransaction.class));
+        verify(intraTransactionRepository, times(1)).save(any(IntraWalletTransaction.class));
     }
 
     @Test

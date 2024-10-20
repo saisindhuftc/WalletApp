@@ -1,7 +1,5 @@
 package com.example.walletapplication.controller;
 
-
-public class InterWalletTransactionController {
-
+class InterWalletTransactionControllerTest {
 
 }

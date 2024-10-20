@@ -1,7 +1,6 @@
 package com.example.walletapplication.entity;
 
 import com.example.walletapplication.enums.TransactionType;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class IntraTransaction {
+public class IntraWalletTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +29,7 @@ public class IntraTransaction {
 
     private LocalDateTime timestamp;
 
-    public IntraTransaction(Wallet wallet,TransactionType type, Double amount,LocalDateTime timestamp) {
+    public IntraWalletTransaction(Wallet wallet, TransactionType type, Double amount, LocalDateTime timestamp) {
         this.wallet = wallet;
         this.type = type;
         this.amount = amount;

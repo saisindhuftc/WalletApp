@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface InterTransactionRepository extends JpaRepository<InterTransaction, Long> {
+public interface InterWalletTransactionRepository extends JpaRepository<InterTransaction, Long> {
 
     // Fetch transactions by senderWalletId within a date range
     @Query("SELECT it FROM InterTransaction it WHERE it.id = :senderWalletId AND it.timestamp BETWEEN :startDate AND :endDate")

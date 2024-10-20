@@ -44,7 +44,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.badRequest().body(Map.of(
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                 "message", e.getMessage(),
                 "status", "Invalid request"
         ));
@@ -59,11 +59,49 @@ public class CustomExceptionHandler {
     }
     @ExceptionHandler(InvalidCurrencyException.class)
     public ResponseEntity<Map<String, String>> handleInvalidCurrencyException(InvalidCurrencyException e) {
-        return ResponseEntity.badRequest().body(Map.of(
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
                 "message", e.getMessage(),
                 "status", "Invalid request"
         ));
     }
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<Map<String, String>> handleInsufficientBalanceException(InsufficientBalanceException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "message", e.getMessage(),
+                "status", "Insufficient balance"
+        ));
+    }
 
-    //w-d
+    @ExceptionHandler(InvalidAmountException.class)
+    public ResponseEntity<Map<String, String>> handleAmountIsInvalidException(InvalidAmountException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "message", e.getMessage(),
+                "status", "Invalid amount"
+        ));
+    }
+
+    @ExceptionHandler(DepositFailedException.class)
+    public ResponseEntity<Map<String, String>> handleDepositFailedException(DepositFailedException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "message", e.getMessage(),
+                "status", "Deposit failed"
+        ));
+    }
+
+    @ExceptionHandler(WithdrawalFailedException.class)
+    public ResponseEntity<Map<String, String>> handleWithdrawalFailedException(WithdrawalFailedException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "message", e.getMessage(),
+                "status", "Withdrawal failed"
+        ));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "message", e.getMessage(),
+                "status", "User not found"
+        ));
+    }
+
 }

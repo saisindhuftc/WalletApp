@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class IntraTransactionTest {
+class IntraWalletTransactionTest {
 
     @Test
     void testIntraTransactionInitialization() {
@@ -16,7 +16,7 @@ class IntraTransactionTest {
         double amount = 50.0;
         LocalDateTime timestamp = LocalDateTime.now();
 
-        IntraTransaction transaction = new IntraTransaction(wallet, TransactionType.DEPOSIT, amount, timestamp);
+        IntraWalletTransaction transaction = new IntraWalletTransaction(wallet, TransactionType.DEPOSIT, amount, timestamp);
 
         assertEquals(wallet, transaction.getWallet());
         assertEquals(TransactionType.DEPOSIT, transaction.getType());
@@ -29,7 +29,7 @@ class IntraTransactionTest {
         Wallet wallet = new Wallet(CurrencyType.USD);
         double amount = 75.0;
 
-        IntraTransaction transaction = new IntraTransaction(wallet, TransactionType.WITHDRAWAL, amount, LocalDateTime.now());
+        IntraWalletTransaction transaction = new IntraWalletTransaction(wallet, TransactionType.WITHDRAWAL, amount, LocalDateTime.now());
 
         assertEquals(amount, transaction.getAmount());
     }
@@ -38,7 +38,7 @@ class IntraTransactionTest {
     void testIntraTransactionWalletNotNull() {
         Wallet wallet = new Wallet(CurrencyType.USD);
 
-        IntraTransaction transaction = new IntraTransaction(wallet, TransactionType.DEPOSIT, 100.0, LocalDateTime.now());
+        IntraWalletTransaction transaction = new IntraWalletTransaction(wallet, TransactionType.DEPOSIT, 100.0, LocalDateTime.now());
 
         assertNotNull(transaction.getWallet());
     }

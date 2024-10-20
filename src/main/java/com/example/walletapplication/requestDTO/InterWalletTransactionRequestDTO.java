@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class InterTransactionRequestDTO {
+public class InterWalletTransactionRequestDTO {
     private Long senderWalletId;
     private Long receiverWalletId;
     private Double amount;
@@ -16,14 +16,14 @@ public class InterTransactionRequestDTO {
     private CurrencyType currency;
     private LocalDateTime timestamp;
 
-    public InterTransactionRequestDTO(Long senderWalletId, Long receiverWalletId, Double amount, CurrencyType currency) {
+    public InterWalletTransactionRequestDTO(Long senderWalletId, Long receiverWalletId, Double amount, CurrencyType currency) {
         this.senderWalletId = senderWalletId;
         this.receiverWalletId = receiverWalletId;
         this.amount = amount;
         this.currency = currency;
     }
 
-    public InterTransactionRequestDTO(){
+    public InterWalletTransactionRequestDTO(){
 
     }
 }
