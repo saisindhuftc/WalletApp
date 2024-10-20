@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
@@ -44,15 +45,32 @@ class TransactionServiceTest {
 
     @Test
     void getTransactionsInvalidSortField() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            transactionService.getTransactions(1L, 1L, "invalidField", "ASC", "DEPOSIT");
+        Long userId = 1L;
+        Long walletId = 1L;
+        String sortBy = "invalidField";
+        String sortOrder = "ASC";
+        String transactionType = "WITHDRAW";
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            transactionService.getTransactions(userId, walletId, sortBy, sortOrder, transactionType);
         });
+
+        assertEquals("Invalid sort field: invalidField", exception.getMessage());
     }
 
     @Test
     void getTransactionsTransactionTypeNull() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            transactionService.getTransactions(1L, 1L, "timestamp", "ASC", null);
+        Long userId = 1L;
+        Long walletId = 1L;
+        String sortBy = "timestamp";
+        String sortOrder = "ASC";
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            transactionService.getTransactions(userId, walletId, sortBy, sortOrder, null);
         });
+
+        assertEquals("Transaction type cannot be null", exception.getMessage());
     }
+
+
 }
