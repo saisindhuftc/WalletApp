@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InterTransaction {
+public class InterWalletTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +33,7 @@ public class InterTransaction {
 
     private LocalDateTime timestamp;
 
-    public InterTransaction(Wallet senderWallet, Wallet receiverWallet, TransactionType transactionType, double amount, LocalDateTime timestamp) {
+    public InterWalletTransaction(Wallet senderWallet, Wallet receiverWallet, TransactionType transactionType, double amount, LocalDateTime timestamp) {
         this.senderWallet = senderWallet;
         this.receiverWallet = receiverWallet;
         this.transactionType = transactionType;

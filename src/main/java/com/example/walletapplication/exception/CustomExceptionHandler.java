@@ -120,5 +120,13 @@ public class CustomExceptionHandler {
         ));
     }
 
+    @ExceptionHandler(TransferFailedException.class)
+    public ResponseEntity<Map<String, String>> handleTransferFailedException(TransferFailedException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "message", e.getMessage(),
+                "status", "Transfer failed"
+        ));
+    }
+
 
 }

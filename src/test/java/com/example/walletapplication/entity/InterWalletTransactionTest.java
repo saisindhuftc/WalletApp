@@ -17,7 +17,7 @@ class InterWalletTransactionTest {
         double amount = 100.0;
         LocalDateTime timestamp = LocalDateTime.now();
 
-        InterTransaction transaction = new InterTransaction(senderWallet, receiverWallet, TransactionType.TRANSFER, amount, timestamp);
+        InterWalletTransaction transaction = new InterWalletTransaction(senderWallet, receiverWallet, TransactionType.TRANSFER, amount, timestamp);
 
         assertEquals(senderWallet, transaction.getSenderWallet());
         assertEquals(receiverWallet, transaction.getReceiverWallet());
@@ -32,7 +32,7 @@ class InterWalletTransactionTest {
         Wallet receiverWallet = new Wallet(CurrencyType.USD);
         double amount = 100.0;
 
-        InterTransaction transaction = new InterTransaction(senderWallet, receiverWallet, TransactionType.TRANSFER, amount, LocalDateTime.now());
+        InterWalletTransaction transaction = new InterWalletTransaction(senderWallet, receiverWallet, TransactionType.TRANSFER, amount, LocalDateTime.now());
 
         assertEquals(amount, transaction.getAmount());
     }
@@ -42,9 +42,30 @@ class InterWalletTransactionTest {
         Wallet senderWallet = new Wallet(CurrencyType.USD);
         Wallet receiverWallet = new Wallet(CurrencyType.USD);
 
-        InterTransaction transaction = new InterTransaction(senderWallet, receiverWallet, TransactionType.TRANSFER, 100.0, LocalDateTime.now());
+        InterWalletTransaction transaction = new InterWalletTransaction(senderWallet, receiverWallet, TransactionType.TRANSFER, 100.0, LocalDateTime.now());
 
         assertNotNull(transaction.getSenderWallet());
         assertNotNull(transaction.getReceiverWallet());
+    }
+
+    @Test
+    void testInterTransactionTimestamp() {
+        Wallet senderWallet = new Wallet(CurrencyType.USD);
+        Wallet receiverWallet = new Wallet(CurrencyType.USD);
+        LocalDateTime timestamp = LocalDateTime.now();
+
+        InterWalletTransaction transaction = new InterWalletTransaction(senderWallet, receiverWallet, TransactionType.TRANSFER, 100.0, timestamp);
+
+        assertEquals(timestamp, transaction.getTimestamp());
+    }
+
+    @Test
+    void testInterTransactionTransactionType() {
+        Wallet senderWallet = new Wallet(CurrencyType.USD);
+        Wallet receiverWallet = new Wallet(CurrencyType.USD);
+
+        InterWalletTransaction transaction = new InterWalletTransaction(senderWallet, receiverWallet, TransactionType.TRANSFER, 100.0, LocalDateTime.now());
+
+        assertEquals(TransactionType.TRANSFER, transaction.getTransactionType());
     }
 }
