@@ -12,10 +12,9 @@ public interface IntraWalletTransactionRepository extends JpaRepository<IntraWal
     @Query("SELECT i FROM IntraWalletTransaction i WHERE i.wallet.id IN (?1)")
     List<IntraWalletTransaction> findByWallets(List<Integer> wallets);
 
-    @Query("SELECT i FROM IntraWalletTransaction i WHERE i.wallet.id IN (?1) and (i.timestamp BETWEEN ?2 AND ?3)")
-    List<IntraWalletTransaction> findByWalletsAndDate(List<Integer> wallets, LocalDateTime startDate, LocalDateTime endDate);
+    @Query("SELECT i FROM IntraWalletTransaction i WHERE i.wallet.id = :walletId AND i.timestamp BETWEEN :startDate AND :endDate")
+    List<IntraWalletTransaction> findByWalletIdAndDate(Long walletId, LocalDateTime startDate, LocalDateTime endDate);
 
     @Query("SELECT i FROM IntraWalletTransaction i WHERE i.wallet.id = ?1 AND i.type = ?2")
     List<IntraWalletTransaction> findByWalletIdAndType(Long walletId, TransactionType type);
 }
-
