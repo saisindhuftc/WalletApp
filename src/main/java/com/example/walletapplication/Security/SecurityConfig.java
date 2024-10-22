@@ -29,15 +29,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)  // Disable CSRF for testing, enable in production as needed
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()  // Allow open access to register
-                        .anyRequest().authenticated()  // All other requests require authentication
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Stateless session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .httpBasic(httpBasic -> {});  // Enable Basic Authentication
+                .httpBasic(httpBasic -> {});
 
         return http.build();
     }
