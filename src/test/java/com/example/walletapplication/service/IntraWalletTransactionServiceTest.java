@@ -35,6 +35,9 @@ public class IntraWalletTransactionServiceTest {
     @Mock
     private Authentication authentication;
 
+    @Mock
+    private CurrencyConverter currencyConverter;
+
     @InjectMocks
     private IntraWalletTransactionService walletService;
 
@@ -48,19 +51,20 @@ public class IntraWalletTransactionServiceTest {
         user.setId(1L);
         user.setUsername("testuser");
 
-        wallet = new Wallet();
+        wallet = new Wallet(CurrencyType.USD, currencyConverter);
         wallet.setId(1L);
         user.setWallet(wallet);
     }
 
     @Test
-    public void testDepositSuccess() {
+    public void testDepositSuccess() throws InvalidAmountException {
         User user = new User("testUser", "password", CurrencyType.USD);
-        Wallet wallet = new Wallet(CurrencyType.USD);
+        Wallet wallet = new Wallet(CurrencyType.USD, currencyConverter);
         user.setWallet(wallet);
 
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
         when(intraTransactionRepository.save(any(IntraWalletTransaction.class))).thenReturn(new IntraWalletTransaction());
+        when(currencyConverter.convertMoney(100.0, CurrencyType.INR, CurrencyType.USD)).thenReturn(100.0);
 
         assertDoesNotThrow(() -> walletService.deposit(1L, 100.0, CurrencyType.INR));
         verify(intraTransactionRepository, times(1)).save(any(IntraWalletTransaction.class));
@@ -126,14 +130,15 @@ public class IntraWalletTransactionServiceTest {
     }
 
     @Test
-    public void testWithdrawSuccess() {
+    public void testWithdrawSuccess() throws InvalidAmountException, InsufficientBalanceException {
         User user = new User("testUser", "password", CurrencyType.USD);
-        Wallet wallet = new Wallet(CurrencyType.USD);
+        Wallet wallet = new Wallet(CurrencyType.USD, currencyConverter);
         wallet.setBalance(200.0);
         user.setWallet(wallet);
 
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
         when(intraTransactionRepository.save(any(IntraWalletTransaction.class))).thenReturn(new IntraWalletTransaction());
+        when(currencyConverter.convertMoney(100.0, CurrencyType.USD, CurrencyType.USD)).thenReturn(100.0);
 
         assertDoesNotThrow(() -> walletService.withdraw(1L, 100.0, CurrencyType.USD));
         verify(intraTransactionRepository, times(1)).save(any(IntraWalletTransaction.class));

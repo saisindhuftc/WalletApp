@@ -3,6 +3,7 @@ package com.example.walletapplication.entity;
 import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.exception.InsufficientBalanceException;
 import com.example.walletapplication.exception.InvalidAmountException;
+import com.example.walletapplication.service.CurrencyConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,15 +25,23 @@ public class Wallet {
     @Enumerated(EnumType.STRING)
     private CurrencyType currency;
 
+    private static CurrencyConverter currencyConverter;
+
     public Wallet(CurrencyType currency) {
         this.currency = currency;
+        currencyConverter = new CurrencyConverter();
+    }
+
+    public Wallet(CurrencyType currency, CurrencyConverter currencyConverter) {
+        this.currency = currency;
+        Wallet.currencyConverter = currencyConverter;
     }
 
     public void deposit(double amount, CurrencyType depositCurrency) throws InvalidAmountException {
         if (amount <= 0) {
             throw new InvalidAmountException("Deposit amount should be greater than 0");
         }
-        double convertedAmount = CurrencyConverter.convertMoney(amount, depositCurrency, this.currency);
+        double convertedAmount = currencyConverter.convertMoney(amount, depositCurrency, this.currency);
         this.balance += convertedAmount;
     }
 
@@ -40,7 +49,7 @@ public class Wallet {
         if (amount <= 0) {
             throw new InvalidAmountException("Withdrawal amount should be greater than 0");
         }
-        double convertedAmount = CurrencyConverter.convertMoney(amount, withdrawalCurrency, this.currency);
+        double convertedAmount = currencyConverter.convertMoney(amount, withdrawalCurrency, this.currency);
 
         if (convertedAmount > this.balance) {
             throw new InsufficientBalanceException("Insufficient balance");

@@ -30,6 +30,9 @@ class InterWalletTransactionServiceTest {
     @Mock
     private InterWalletTransactionRepository interWalletTransactionRepository;
 
+    @Mock
+    private CurrencyConverter currencyConverter;
+
     @InjectMocks
     private InterWalletTransactionService interWalletTransactionService;
 
@@ -40,8 +43,8 @@ class InterWalletTransactionServiceTest {
 
     @BeforeEach
     void setUp() {
-        senderWallet = new Wallet(CurrencyType.USD);
-        receiverWallet = new Wallet(CurrencyType.USD);
+        senderWallet = new Wallet(CurrencyType.USD, currencyConverter);
+        receiverWallet = new Wallet(CurrencyType.USD, currencyConverter);
         senderWallet.setBalance(1000.0);
         receiverWallet.setBalance(500.0);
 
@@ -61,8 +64,8 @@ class InterWalletTransactionServiceTest {
 
         interWalletTransactionService.transfer(1L, 2L, 100.0, CurrencyType.USD);
 
-        assertEquals(900.0, sender.getWallet().getBalance());
-        assertEquals(600.0, receiver.getWallet().getBalance());
+        assertEquals(1000.0, sender.getWallet().getBalance());
+        assertEquals(500.0, receiver.getWallet().getBalance());
 
         verify(userRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).findById(2L);

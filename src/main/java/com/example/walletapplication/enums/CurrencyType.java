@@ -14,4 +14,5 @@ public enum CurrencyType {
 
     public double getConversionFactor() {
         return conversionFactor;
-    }}
+    }
+}

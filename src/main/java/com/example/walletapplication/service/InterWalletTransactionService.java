@@ -4,7 +4,6 @@ import com.example.walletapplication.entity.InterWalletTransaction;
 import com.example.walletapplication.entity.User;
 import com.example.walletapplication.enums.CurrencyType;
 import com.example.walletapplication.enums.TransactionType;
-import com.example.walletapplication.exception.UserAndWalletMismatchException;
 import com.example.walletapplication.exception.UserNotFoundException;
 import com.example.walletapplication.exception.WalletNotFoundException;
 import com.example.walletapplication.repository.InterWalletTransactionRepository;
