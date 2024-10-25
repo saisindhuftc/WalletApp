@@ -6,7 +6,6 @@ import io.grpc.ManagedChannelBuilder;
 import proto.ConvertRequest;
 import proto.ConvertResponse;
 import proto.CurrencyConverterGrpc;
-import proto.CurrencyConverterOuterClass;
 
 public class CurrencyConverter {
 
@@ -29,7 +28,7 @@ public class CurrencyConverter {
             throw new IllegalArgumentException("Currency type cannot be null");
         }
 
-       ConvertRequest request = ConvertRequest.newBuilder()
+        ConvertRequest request = ConvertRequest.newBuilder()
                 .setAmount(amount)
                 .setSourceCurrency(sourceCurrency.name())
                 .setTargetCurrency(targetCurrency.name())
